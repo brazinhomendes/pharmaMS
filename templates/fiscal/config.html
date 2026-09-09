@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Config Fiscal - pharmaMS{% endblock %}
+{% block page_title %}Configuração Fiscal{% endblock %}
+{% block content %}
+<div class="card-dashboard p-4">
+    <form method="post">
+        {% csrf_token %}
+        <h6 class="fw-semibold mb-3">Numeração</h6>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Série NF-e</label>
+                <input type="number" name="serie_nfe" class="form-control" value="{{ config.serie_nfe }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Série NFC-e</label>
+                <input type="number" name="serie_nfce" class="form-control" value="{{ config.serie_nfce }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Próximo Nº NF-e</label>
+                <input type="number" name="proximo_numero_nfe" class="form-control" value="{{ config.proximo_numero_nfe }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Próximo Nº NFC-e</label>
+                <input type="number" name="proximo_numero_nfce" class="form-control" value="{{ config.proximo_numero_nfce }}">
+            </div>
+        </div>
+        <h6 class="fw-semibold mb-3">Regime Tributário</h6>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <select name="regime_tributario" class="form-select">
+                    <option value="1" {% if config.regime_tributario == '1' %}selected{% endif %}>Simples Nacional</option>
+                    <option value="2" {% if config.regime_tributario == '2' %}selected{% endif %}>Simples Excesso</option>
+                    <option value="3" {% if config.regime_tributario == '3' %}selected{% endif %}>Regime Normal</option>
+                </select>
+            </div>
+        </div>
+        <h6 class="fw-semibold mb-3">NFC-e (SAT)</h6>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label">CSC</label>
+                <input type="text" name="csc" class="form-control" value="{{ config.csc }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">CSC ID</label>
+                <input type="text" name="csc_id" class="form-control" value="{{ config.csc_id }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Token IBPT</label>
+                <input type="text" name="token_ibpt" class="form-control" value="{{ config.token_ibpt }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}SPED Contribuições - pharmaMS{% endblock %}
+{% block page_title %}SPED Contribuições{% endblock %}
+{% block content %}
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Período</th>
+                    <th>Tipo</th>
+                    <th>Processado</th>
+                    <th>Arquivo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sped in speds %}
+                <tr>
+                    <td>{{ sped.periodo }}</td>
+                    <td>{{ sped.get_tipo_contribuicao_display }}</td>
+                    <td>
+                        {% if sped.processado %}
+                        <span class="badge bg-success">Sim</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Não</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if sped.arquivo_gerado %}
+                        <a href="{{ sped.arquivo_gerado.url }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></a>
+                        {% else %}
+                        <span style="color:var(--text-muted);">---</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center py-4" style="color:var(--text-muted);">Nenhum SPED encontrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

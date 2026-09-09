@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Vendas por Período - Relatórios{% endblock %}
+{% block page_title %}Vendas por Período{% endblock %}
+{% block content %}
+<form method="get" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small">Data Início</label>
+                <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ data_inicio }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Data Fim</label>
+                <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ data_fim }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Forma de Pagamento</label>
+                <select name="forma_pagamento" class="form-select form-select-sm">
+                    <option value="">Todas</option>
+                    <option value="dinheiro" {% if forma_pagamento == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
+                    <option value="credito" {% if forma_pagamento == 'credito' %}selected{% endif %}>Crédito</option>
+                    <option value="debito" {% if forma_pagamento == 'debito' %}selected{% endif %}>Débito</option>
+                    <option value="pix" {% if forma_pagamento == 'pix' %}selected{% endif %}>Pix</option>
+                    <option value="convenio" {% if forma_pagamento == 'convenio' %}selected{% endif %}>Convênio</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Total de Vendas</small>
+                <h4 class="mb-0">{{ total_vendas }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Faturamento Bruto</small>
+                <h4 class="mb-0 text-success">R$ {{ total_geral|floatformat:2|intcomma }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Descontos</small>
+                <h4 class="mb-0 text-danger">R$ {{ total_desconto|floatformat:2|intcomma }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent border-0">
+        <h6 class="mb-0">Vendas por Dia</h6>
+    </div>
+    <div class="card-body">
+        <canvas id="chartVendas" height="100"></canvas>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Vendas Realizadas</h6>
+        <span class="text-muted small">{{ total_vendas }} registro(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Forma Pag.</th>
+                        <th>Desconto</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vendas %}
+                    <tr>
+                        <td>{{ v.numero_venda }}</td>
+                        <td>{{ v.data_venda|date:"d/m/Y H:i" }}</td>
+                        <td>{{ v.cliente.nome|default:"Consumidor" }}</td>
+                        <td>{{ v.get_forma_pagamento_display }}</td>
+                        <td>R$ {{ v.desconto|floatformat:2|intcomma }}</td>
+                        <td class="text-end">R$ {{ v.total|floatformat:2|intcomma }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Nenhuma venda encontrada</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="5">Total Geral</th>
+                        <th class="text-end">R$ {{ total_geral|floatformat:2|intcomma }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('{% url "relatorios:vendas_json" %}?days=30')
+        .then(r => r.json())
+        .then(data => {
+            const ctx = document.getElementById('chartVendas').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.dia),
+                    datasets: [{
+                        label: 'Faturamento (R$)',
+                        data: data.map(d => d.total),
+                        backgroundColor: 'rgba(13,110,253,0.2)',
+                        borderColor: 'rgba(13,110,253,1)',
+                        borderWidth: 1,
+                        yAxisID: 'y',
+                    }, {
+                        label: 'Qtd Vendas',
+                        data: data.map(d => d.quantidade),
+                        backgroundColor: 'rgba(25,135,84,0.2)',
+                        borderColor: 'rgba(25,135,84,1)',
+                        borderWidth: 1,
+                        yAxisID: 'y1',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: { display: true, text: 'Faturamento (R$)' } },
+                        y1: { type: 'linear', display: true, position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'Qtd Vendas' } },
+                    }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+Django>=6.0,<7.0
+django-crispy-forms>=2.6
+crispy-bootstrap5>=2026.3
+djangorestframework>=3.17
+drf-spectacular>=0.28
+drf-spectacular-sidecar>=2025.2
+pymupdf>=1.28
+Pillow>=11.0
+gunicorn>=23.0
+psycopg2-binary>=2.9
+python-dotenv>=1.0
+whitenoise>=6.7
+cryptography>=44.0
+requests>=2.32

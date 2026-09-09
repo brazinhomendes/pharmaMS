@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Sugestão {{ sugestao.data_geracao }} - pharmaMS{% endblock %}
+{% block page_title %}Sugestão de Compra - {{ sugestao.data_geracao|date:"d/m/Y" }}{% endblock %}
+{% block content %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="card-dashboard p-3">
+            <h6 class="fw-semibold mb-3">Informações</h6>
+            <table class="table table-sm">
+                <tr><th style="width:160px">Data Geração:</th><td>{{ sugestao.data_geracao|date:"d/m/Y" }}</td></tr>
+                <tr><th>Período Análise:</th><td>{{ sugestao.data_inicio_analise|date:"d/m/Y" }} a {{ sugestao.data_fim_analise|date:"d/m/Y" }}</td></tr>
+                <tr><th>Processada:</th>
+                    <td>
+                        {% if sugestao.processada %}
+                        <span class="badge bg-success">Sim</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Não</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr><th>Pedido Vinculado:</th><td>{{ sugestao.pedido.numero_pedido|default:"-" }}</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4 d-flex align-items-start justify-content-end gap-2">
+        {% if not sugestao.processada %}
+        <a href="{% url 'compras:sugestao_criar_pedido' sugestao.pk %}" class="btn btn-success">
+            <i class="bi bi-bag-plus"></i> Criar Pedido
+        </a>
+        {% endif %}
+        <a href="{% url 'compras:sugestoes' %}" class="btn btn-outline-secondary">Voltar</a>
+    </div>
+</div>
+
+<div class="card-dashboard p-0">
+    <table class="table table-pharma mb-0">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Estoque Atual</th>
+                <th>Est. Mínimo</th>
+                <th>Vendas Período</th>
+                <th>Dias Estoque</th>
+                <th>Sugestão Compra</th>
+                <th>Prioridade</th>
+                <th>Aprovado</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in sugestao.itens.all %}
+            <tr>
+                <td>{{ item.produto.nome }}</td>
+                <td>{{ item.estoque_atual }}</td>
+                <td>{{ item.estoque_minimo }}</td>
+                <td>{{ item.vendas_periodo }}</td>
+                <td>{{ item.dias_estoque }}</td>
+                <td><strong>{{ item.sugestao_compra }}</strong></td>
+                <td>
+                    <span class="badge bg-{% if item.prioridade == 'alta' %}danger{% elif item.prioridade == 'media' %}warning text-dark{% else %}secondary{% endif %}">
+                        {{ item.get_prioridade_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if item.aprovado %}
+                    <span class="badge bg-success">Sim</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Não</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'compras:sugestao_aprovar_item' sugestao.pk item.pk %}" class="btn btn-sm btn-{% if item.aprovado %}warning{% else %}success{% endif %}">
+                        {% if item.aprovado %}Desaprovar{% else %}Aprovar{% endif %}
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

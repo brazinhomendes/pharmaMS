@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Receber Pedido - pharmaMS{% endblock %}
+{% block page_title %}Receber Pedido {{ pedido.numero_pedido }}{% endblock %}
+{% block content %}
+
+<div class="card-dashboard p-4">
+    <form method="post">
+        {% csrf_token %}
+        <p class="text-muted mb-4">Informe as quantidades recebidas para cada item do pedido.</p>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Pedido</th>
+                    <th>Já Recebido</th>
+                    <th>A Receber</th>
+                    <th>Qtd Recebida</th>
+                    <th>Lote</th>
+                    <th>Validade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pedido.itens.all %}
+                <tr>
+                    <td>{{ item.produto.nome }}</td>
+                    <td>{{ item.quantidade }}</td>
+                    <td>{{ item.quantidade_recebida }}</td>
+                    <td>{{ item.pendente }}</td>
+                    <td>
+                        <input type="number" name="qtd_recebida_{{ item.id }}" class="form-control" min="0" max="{{ item.pendente }}" value="{{ item.pendente }}">
+                    </td>
+                    <td>
+                        <input type="text" name="codigo_lote_{{ item.id }}" class="form-control" placeholder="LOTE-{{ item.id }}">
+                    </td>
+                    <td>
+                        <input type="date" name="data_validade_{{ item.id }}" class="form-control">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> Confirmar Recebimento</button>
+            <a href="{% url 'compras:detalhe' pedido.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

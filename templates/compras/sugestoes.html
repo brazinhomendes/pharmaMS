@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Sugestões de Compra - pharmaMS{% endblock %}
+{% block page_title %}Sugestões de Compra{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <span class="text-muted">Sugestões geradas com base no estoque e vendas.</span>
+    <a href="{% url 'compras:sugestoes_gerar' %}" class="btn btn-pharma"><i class="bi bi-plus-lg"></i> Nova Sugestão</a>
+</div>
+
+<div class="card-dashboard p-0">
+    <table class="table table-pharma mb-0">
+        <thead>
+            <tr>
+                <th>Data Geração</th>
+                <th>Período Análise</th>
+                <th>Itens</th>
+                <th>Processada</th>
+                <th>Pedido</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in sugestoes %}
+            <tr>
+                <td>{{ s.data_geracao|date:"d/m/Y" }}</td>
+                <td>{{ s.data_inicio_analise|date:"d/m/Y" }} a {{ s.data_fim_analise|date:"d/m/Y" }}</td>
+                <td>{{ s.itens.count }}</td>
+                <td>
+                    {% if s.processada %}
+                    <span class="badge bg-success">Sim</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Não</span>
+                    {% endif %}
+                </td>
+                <td>{{ s.pedido.numero_pedido|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'compras:sugestao_detalhe' s.pk %}" class="btn btn-sm btn-pharma-outline">Detalhe</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma sugestão de compra.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

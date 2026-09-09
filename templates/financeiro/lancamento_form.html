@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Novo Lançamento - pharmaMS{% endblock %}
+{% block page_title %}Novo Lançamento{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex align-items-center gap-2">
+    <i class="bi bi-journal-plus" style="color:var(--primary);"></i>
+    <span>Novo Lançamento</span>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Descrição *</label>
+          <input type="text" name="descricao" class="form-control" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Valor *</label>
+          <input type="number" name="valor" class="form-control" step="0.01" min="0" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Tipo *</label>
+          <select name="tipo" class="form-select" required>
+            <option value="receita">Receita</option>
+            <option value="despesa">Despesa</option>
+            <option value="transferencia">Transferência</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Categoria</label>
+          <input type="text" name="categoria" class="form-control" placeholder="Ex: Medicamentos">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Forma de Pagamento</label>
+          <select name="forma_pagamento" class="form-select">
+            <option value="">Selecione</option>
+            <option value="dinheiro">Dinheiro</option>
+            <option value="credito">Cartão Crédito</option>
+            <option value="debito">Cartão Débito</option>
+            <option value="pix">PIX</option>
+            <option value="boleto">Boleto</option>
+            <option value="transferencia">Transferência Bancária</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Observação</label>
+          <textarea name="observacao" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+      <hr class="my-3">
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
+        <a href="{% url 'financeiro:lancamentos' %}" class="btn btn-ghost">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

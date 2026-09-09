@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Campanha - pharmaMS{% endblock %}
+{% block content %}
+<div class="page-header"><div><h5><i class="bi bi-megaphone text-info me-2"></i>{{ campanha|yesno:"Editar,Criar" }} Campanha</h5></div></div>
+<div class="row"><div class="col-lg-8">
+    <div class="card"><div class="card-body">
+        <form method="post">{% csrf_token %}
+            <div class="row g-3">
+                <div class="col-12"><label class="form-label">Nome da Campanha</label><input type="text" name="nome" class="form-control" value="{{ campanha.nome|default:'' }}" required></div>
+                <div class="col-12"><label class="form-label">Descricao</label><textarea name="descricao" class="form-control" rows="3">{{ campanha.descricao|default:'' }}</textarea></div>
+                <div class="col-md-6"><label class="form-label">Data Inicio</label><input type="date" name="data_inicio" class="form-control" value="{{ campanha.data_inicio|date:'Y-m-d'|default:'' }}" required></div>
+                <div class="col-md-6"><label class="form-label">Data Fim</label><input type="date" name="data_fim" class="form-control" value="{{ campanha.data_fim|date:'Y-m-d'|default:'' }}" required></div>
+            </div>
+            <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> Salvar</button><a href="{% url 'crm:index' %}" class="btn btn-ghost">Cancelar</a></div>
+        </form>
+    </div></div>
+</div></div>
+{% endblock %}

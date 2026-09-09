@@ -1,0 +1,42 @@
+# pharmaMS
+
+# Ambiente
+.env
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# PostgreSQL local
+pgdata/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Certificados e chaves
+*.pfx
+*.pem
+*.key

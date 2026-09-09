@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}{{ usuario|yesno:"Editar Usuário,Novo Usuário" }} - pharmaMS{% endblock %}
+{% block page_title %}{{ usuario|yesno:"Editar Usuário,Novo Usuário" }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h5 class="d-flex align-items-center gap-2">
+            <i class="bi bi-person-gear text-primary"></i>
+            {{ usuario|yesno:"Editar Usuário,Novo Usuário" }}
+        </h5>
+        {% if usuario %}
+        <p class="page-subtitle mb-0">Editar: {{ usuario.username }}</p>
+        {% else %}
+        <p class="page-subtitle mb-0">Preencha os dados do novo usuário</p>
+        {% endif %}
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'usuarios:lista' %}" class="btn btn-ghost">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-person text-primary"></i>
+                        <span>Dados do Usuário</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-person-badge me-1 text-muted"></i>Nome de Usuário
+                            </label>
+                            <input type="text" name="username" class="form-control" value="{{ usuario.username|default:'' }}" required{% if usuario %} readonly{% endif %}>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-envelope-at me-1 text-muted"></i>E-mail
+                            </label>
+                            <input type="email" name="email" class="form-control" value="{{ usuario.email|default:'' }}" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">
+                                <i class="bi bi-person-lines-fill me-1 text-muted"></i>Nome Completo
+                            </label>
+                            <input type="text" name="nome_completo" class="form-control" value="{{ usuario.nome_completo|default:'' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="bi bi-telephone me-1 text-muted"></i>Telefone
+                            </label>
+                            <input type="text" name="telefone" class="form-control" value="{{ usuario.telefone|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-building text-success"></i>
+                        <span>Vinculo Empresarial</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">
+                                <i class="bi bi-shop me-1 text-muted"></i>Empresa
+                            </label>
+                            <select name="empresa_id" class="form-select">
+                                <option value="">Sem empresa</option>
+                                {% for empresa in empresas %}
+                                <option value="{{ empresa.id }}"{% if usuario and usuario.empresa_id == empresa.id %} selected{% endif %}>{{ empresa.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="bi bi-shield-lock me-1 text-muted"></i>Perfil de Acesso
+                            </label>
+                            <select name="perfil" class="form-select">
+                                {% for value, label in PERFIL_CHOICES %}
+                                <option value="{{ value }}"{% if usuario and usuario.perfil == value %} selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-key text-warning"></i>
+                        <span>Senha & Status</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-lock me-1 text-muted"></i>Senha
+                        </label>
+                        <input type="password" name="password" class="form-control"{% if usuario %} placeholder="Deixe vazio para manter"{% endif %}{% if not usuario %} required{% endif %}>
+                        {% if usuario %}
+                        <div class="form-text">Deixe vazio para manter</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-check form-switch mb-3" style="padding-top:.35rem;">
+                        <input type="checkbox" name="is_active" class="form-check-input" id="id_is_active" role="switch"{% if not usuario or usuario.is_active %} checked{% endif %}>
+                        <label class="form-check-label" for="id_is_active">Usuário Ativo</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>
+                            {{ usuario|yesno:"Salvar Alterações,Criar Usuário" }}
+                        </button>
+                        <a href="{% url 'usuarios:lista' %}" class="btn btn-ghost">
+                            <i class="bi bi-x-lg me-1"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

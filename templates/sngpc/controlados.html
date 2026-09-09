@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Medicamentos Controlados - pharmaMS{% endblock %}
+{% block page_title %}Medicamentos Controlados{% endblock %}
+{% block content %}
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Classe Terapêutica</th>
+                    <th>Tipo Receita</th>
+                    <th>Concentração</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for med in medicamentos %}
+                <tr>
+                    <td><strong>{{ med.produto.nome }}</strong></td>
+                    <td>{{ med.classe_terapeutica.nome }}</td>
+                    <td><span class="badge bg-info text-dark">{{ med.get_tipo_receita_display }}</span></td>
+                    <td>{{ med.concentracao|default:'---' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center py-4" style="color:var(--text-muted);">Nenhum medicamento controlado cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

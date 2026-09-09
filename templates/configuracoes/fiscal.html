@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações Fiscais{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Configurações Fiscais</h1>
+</div>
+
+<div class="d-flex gap-4">
+  <nav class="config-sidebar" style="min-width: 220px;">
+    <div class="card">
+      <div class="card-header">Configurações</div>
+      <div class="card-body p-0">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'configuracoes:index' %}">Geral</a>
+          <a class="nav-link active" href="{% url 'configuracoes:fiscal' %}">Fiscal</a>
+          <a class="nav-link" href="{% url 'configuracoes:municipal' %}">Municipal / Tributos</a>
+          <a class="nav-link" href="{% url 'configuracoes:email' %}">E-mail</a>
+          <a class="nav-link" href="{% url 'configuracoes:backup' %}">Backup</a>
+        </nav>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex-grow-1">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Dados do Contribuinte -->
+      <div class="card mb-4">
+        <div class="card-header">Dados do Contribuinte</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="cnae" class="form-label">CNAE</label>
+              <input type="text" class="form-control" id="cnae" name="cnae" value="{{ fiscal.cnae|default:'' }}">
+            </div>
+            <div class="col-md-4">
+              <label for="cnes" class="form-label">CNES</label>
+              <input type="text" class="form-control" id="cnes" name="cnes" value="{{ fiscal.cnes|default:'' }}">
+            </div>
+            <div class="col-md-4">
+              <label for="codigo_municipio" class="form-label">Código Município</label>
+              <input type="text" class="form-control" id="codigo_municipio" name="codigo_municipio" value="{{ fiscal.codigo_municipio|default:'' }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="inscricao_municipal" class="form-label">Inscrição Municipal</label>
+              <input type="text" class="form-control" id="inscricao_municipal" name="inscricao_municipal" value="{{ fiscal.inscricao_municipal|default:'' }}">
+            </div>
+            <div class="col-md-6">
+              <label for="perfil_ecf" class="form-label">Perfil ECF</label>
+              <select class="form-select" id="perfil_ecf" name="perfil_ecf">
+                <option value="A" {% if fiscal.perfil_ecf == 'A' %}selected{% endif %}>A - Industrial / Importadora</option>
+                <option value="B" {% if fiscal.perfil_ecf == 'B' %}selected{% endif %}>B - Industria, Comércio e Prestação de Serviços</option>
+                <option value="C" {% if fiscal.perfil_ecf == 'C' %}selected{% endif %}>C - Comércio e Prestação de Serviços</option>
+                <option value="D" {% if fiscal.perfil_ecf == 'D' %}selected{% endif %}>D - Demais Estabelecimentos</option>
+                <option value="E" {% if fiscal.perfil_ecf == 'E' %}selected{% endif %}>E - Órgão Fiscal</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NF-e -->
+      <div class="card mb-4">
+        <div class="card-header">Nota Fiscal Eletrônica (NF-e)</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label for="nfe_ambiente" class="form-label">Ambiente</label>
+              <select class="form-select" id="nfe_ambiente" name="nfe_ambiente">
+                <option value="1" {% if fiscal.nfe_ambiente == '1' %}selected{% endif %}>Produção</option>
+                <option value="2" {% if fiscal.nfe_ambiente == '2' %}selected{% endif %}>Homologação</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="nfe_versao" class="form-label">Versão</label>
+              <input type="text" class="form-control" id="nfe_versao" name="nfe_versao" value="{{ fiscal.nfe_versao|default:'4.00' }}">
+            </div>
+            <div class="col-md-3">
+              <label for="nfe_serie" class="form-label">Série</label>
+              <input type="text" class="form-control" id="nfe_serie" name="nfe_serie" value="{{ fiscal.nfe_serie|default:'1' }}">
+            </div>
+            <div class="col-md-3">
+              <label for="nfe_numero_atual" class="form-label">Número Atual</label>
+              <input type="number" class="form-control" id="nfe_numero_atual" name="nfe_numero_atual" value="{{ fiscal.nfe_numero_atual|default:'1' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NFC-e -->
+      <div class="card mb-4">
+        <div class="card-header">Nota Fiscal de Consumidor Eletrônica (NFC-e)</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label for="nfce_ambiente" class="form-label">Ambiente</label>
+              <select class="form-select" id="nfce_ambiente" name="nfce_ambiente">
+                <option value="1" {% if fiscal.nfce_ambiente == '1' %}selected{% endif %}>Produção</option>
+                <option value="2" {% if fiscal.nfce_ambiente == '2' %}selected{% endif %}>Homologação</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="nfce_versao" class="form-label">Versão</label>
+              <input type="text" class="form-control" id="nfce_versao" name="nfce_versao" value="{{ fiscal.nfce_versao|default:'4.00' }}">
+            </div>
+            <div class="col-md-3">
+              <label for="nfce_serie" class="form-label">Série</label>
+              <input type="text" class="form-control" id="nfce_serie" name="nfce_serie" value="{{ fiscal.nfce_serie|default:'1' }}">
+            </div>
+            <div class="col-md-3">
+              <label for="nfce_numero_atual" class="form-label">Número Atual</label>
+              <input type="number" class="form-control" id="nfce_numero_atual" name="nfce_numero_atual" value="{{ fiscal.nfce_numero_atual|default:'1' }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="csc_id" class="form-label">CSC ID</label>
+              <input type="text" class="form-control" id="csc_id" name="csc_id" value="{{ fiscal.csc_id|default:'' }}">
+            </div>
+            <div class="col-md-6">
+              <label for="csc_token" class="form-label">CSC Token</label>
+              <input type="text" class="form-control" id="csc_token" name="csc_token" value="{{ fiscal.csc_token|default:'' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificado A1 -->
+      <div class="card mb-4">
+        <div class="card-header">Certificado A1</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="certificado_arquivo" class="form-label">Arquivo do Certificado (.pfx)</label>
+              <input type="file" class="form-control" id="certificado_arquivo" name="certificado_arquivo" accept=".pfx,.p12">
+            </div>
+            <div class="col-md-3">
+              <label for="certificado_senha" class="form-label">Senha do Certificado</label>
+              <input type="password" class="form-control" id="certificado_senha" name="certificado_senha">
+            </div>
+            <div class="col-md-3">
+              <label for="certificado_validade" class="form-label">Validade</label>
+              <input type="date" class="form-control" id="certificado_validade" name="certificado_validade" value="{{ fiscal.certificado_validade|default:'' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPED / Sintegra -->
+      <div class="card mb-4">
+        <div class="card-header">SPED / Sintegra</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sped_fiscal" name="sped_fiscal" {% if fiscal.sped_fiscal %}checked{% endif %}>
+                <label class="form-check-label" for="sped_fiscal">SPED Fiscal</label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sped_contabil" name="sped_contabil" {% if fiscal.sped_contabil %}checked{% endif %}>
+                <label class="form-check-label" for="sped_contabil">SPED Contábil</label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sped_contribuicoes" name="sped_contribuicoes" {% if fiscal.sped_contribuicoes %}checked{% endif %}>
+                <label class="form-check-label" for="sped_contribuicoes">SPED Contribuições</label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sintegra" name="sintegra" {% if fiscal.sintegra %}checked{% endif %}>
+                <label class="form-check-label" for="sintegra">Sintegra</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Salvar Configurações Fiscais</button>
+      <a href="{% url 'configuracoes:index' %}" class="btn btn-ghost">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

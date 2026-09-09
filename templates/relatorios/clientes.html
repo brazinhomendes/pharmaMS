@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Clientes Fiéis - Relatórios{% endblock %}
+{% block page_title %}Clientes Fiéis{% endblock %}
+{% block content %}
+<form method="get" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Data Início</label>
+                <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ data_inicio }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Data Fim</label>
+                <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ data_fim }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0">Top Clientes por Valor</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartClientes" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0">Top Clientes por Compras</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartClientesQtd" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Ranking de Clientes</h6>
+        <span class="text-muted small">{{ clientes|length }} cliente(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th class="text-end">Compras</th>
+                        <th class="text-end">Valor Total</th>
+                        <th class="text-end">Ticket Médio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in clientes %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ c.cliente__nome }}</td>
+                        <td class="text-end">{{ c.total_compras }}</td>
+                        <td class="text-end">R$ {{ c.valor_total|floatformat:2|intcomma }}</td>
+                        <td class="text-end">R$ {{ c.ticket_medio|floatformat:2|intcomma }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Nenhum cliente encontrado</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams({ data_inicio: '{{ data_inicio }}', data_fim: '{{ data_fim }}' });
+    fetch('{% url "relatorios:clientes_json" %}?' + params)
+        .then(r => r.json())
+        .then(data => {
+            const nomes = data.map(d => d.nome.length > 20 ? d.nome.substring(0,18)+'..' : d.nome);
+            const valores = data.map(d => d.total);
+            const compras = data.map(d => d.compras);
+            new Chart(document.getElementById('chartClientes'), {
+                type: 'bar',
+                data: {
+                    labels: nomes,
+                    datasets: [{
+                        label: 'Valor Total (R$)',
+                        data: valores,
+                        backgroundColor: 'rgba(13,110,253,0.2)',
+                        borderColor: 'rgba(13,110,253,1)',
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+            new Chart(document.getElementById('chartClientesQtd'), {
+                type: 'bar',
+                data: {
+                    labels: nomes,
+                    datasets: [{
+                        label: 'Compras',
+                        data: compras,
+                        backgroundColor: 'rgba(25,135,84,0.2)',
+                        borderColor: 'rgba(25,135,84,1)',
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

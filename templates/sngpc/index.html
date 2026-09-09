@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}SNGPC - pharmaMS{% endblock %}
+{% block page_title %}SNGPC{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'sngpc:controlados' %}" class="text-decoration-none">
+            <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:var(--warning-light);">
+                    <i class="bi bi-capsule" style="color:var(--warning);font-size:1.3rem;"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ controlados_count }}</div>
+                    <div class="stat-label">Medicamentos Controlados</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'sngpc:receitas' %}" class="text-decoration-none">
+            <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:var(--primary-light);">
+                    <i class="bi bi-file-text" style="color:var(--primary);font-size:1.3rem;"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ receitas_count }}</div>
+                    <div class="stat-label">Receituários</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'sngpc:movimentos' %}" class="text-decoration-none">
+            <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:#d1fae5;">
+                    <i class="bi bi-arrow-left-right" style="color:var(--success);font-size:1.3rem;"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ movimentos_count }}</div>
+                    <div class="stat-label">Movimentações</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'sngpc:relatorios' %}" class="text-decoration-none">
+            <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:#fce7f3;">
+                    <i class="bi bi-file-earmark-bar-graph" style="color:#ec4899;font-size:1.3rem;"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ relatorios_count }}</div>
+                    <div class="stat-label">Relatórios</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

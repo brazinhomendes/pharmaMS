@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Receituários - pharmaMS{% endblock %}
+{% block page_title %}Receituários{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span style="color:var(--text-muted);">{{ receituarios|length }} receita(s)</span>
+    <a href="{% url 'sngpc:receita_nova' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nova Receita</a>
+</div>
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Nº Receita</th>
+                    <th>Paciente</th>
+                    <th>Profissional</th>
+                    <th>Emissão</th>
+                    <th>Validade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receita in receituarios %}
+                <tr>
+                    <td><strong>{{ receita.numero_receita }}</strong></td>
+                    <td>{{ receita.paciente_nome }}</td>
+                    <td>{{ receita.profissional.nome }}</td>
+                    <td>{{ receita.data_emissao|date:'d/m/Y' }}</td>
+                    <td>{{ receita.data_validade|date:'d/m/Y' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center py-4" style="color:var(--text-muted);">Nenhum receituário encontrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

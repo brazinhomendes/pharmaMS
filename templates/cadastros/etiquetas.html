@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Impressões de Etiquetas - pharmaMS{% endblock %}
+{% block page_title %}Etiquetas de Preços{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Impressões Realizadas</h5>
+    <div>
+        <a href="{% url 'cadastros:etiquetas_modelos' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-layout-three-columns"></i> Modelos
+        </a>
+        <a href="{% url 'cadastros:etiquetas_imprimir' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-printer"></i> Nova Impressão
+        </a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Modelo</th>
+                        <th>Origem</th>
+                        <th>Usuário</th>
+                        <th>Cópias</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in impressoes %}
+                    <tr>
+                        <td>{{ i.data_impressao|date:'d/m/Y H:i' }}</td>
+                        <td>{{ i.modelo.nome }}</td>
+                        <td>{{ i.get_tipo_origem_display }}</td>
+                        <td>{{ i.usuario.get_full_name|default:i.usuario.username }}</td>
+                        <td>{{ i.quantidade_copias }}</td>
+                        <td>
+                            <a href="{% url 'cadastros:etiquetas_pdf' i.id %}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                <i class="bi bi-file-earmark-pdf"></i> PDF
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted">Nenhuma impressão realizada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

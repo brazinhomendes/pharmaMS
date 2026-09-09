@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nova Transação PBM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Nova Transação PBM</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-plus-circle"></i> Criar Transação</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label" for="id_operadora">Operadora</label>
+                <select name="operadora" id="id_operadora" class="form-select" required>
+                    <option value="">Selecione a operadora...</option>
+                    {% for operadora in operadoras %}
+                        <option value="{{ operadora.pk }}">{{ operadora.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="id_numero_autorizacao">Número da Autorização</label>
+                <input type="text" name="numero_autorizacao" id="id_numero_autorizacao"
+                       class="form-control" placeholder="Ex: 2026-001234" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="id_valor_total">Valor Total (R$)</label>
+                <input type="number" name="valor_total" id="id_valor_total"
+                       class="form-control" step="0.01" min="0" placeholder="0,00" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="id_valor_desconto">Valor Desconto (R$)</label>
+                <input type="number" name="valor_desconto" id="id_valor_desconto"
+                       class="form-control" step="0.01" min="0" placeholder="0,00" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="id_valor_repassado">Valor Repassado (R$)</label>
+                <input type="number" name="valor_repassado" id="id_valor_repassado"
+                       class="form-control" step="0.01" min="0" placeholder="0,00" required>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Criar Transação
+                </button>
+                <a href="{% url 'pbm:transacao_list' %}" class="btn btn-ghost">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

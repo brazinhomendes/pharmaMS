@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}NFC-e - pharmaMS{% endblock %}
+{% block page_title %}NFC-e{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex gap-2 align-items-center">
+        <span style="color:var(--text-muted);">{{ nfces|length }} nota(s)</span>
+        <div class="btn-group btn-group-sm">
+            <a href="{% url 'fiscal:nfce_lista' %}" class="btn btn-outline-secondary {% if not request.GET.status %}active{% endif %}">Todas</a>
+            <a href="{% url 'fiscal:nfce_lista' %}?status=autorizada" class="btn btn-outline-success {% if request.GET.status == 'autorizada' %}active{% endif %}">Autorizadas</a>
+            <a href="{% url 'fiscal:nfce_lista' %}?status=pendente" class="btn btn-outline-warning {% if request.GET.status == 'pendente' %}active{% endif %}">Pendentes</a>
+            <a href="{% url 'fiscal:nfce_lista' %}?status=cancelada" class="btn btn-outline-secondary {% if request.GET.status == 'cancelada' %}active{% endif %}">Canceladas</a>
+            <a href="{% url 'fiscal:nfce_lista' %}?status=denegada" class="btn btn-outline-danger {% if request.GET.status == 'denegada' %}active{% endif %}">Denegadas</a>
+        </div>
+    </div>
+    <div>
+        <a href="{% url 'fiscal:nfce_pendentes' %}" class="btn btn-warning btn-sm me-1"><i class="bi bi-exclamation-triangle"></i> Contingencia</a>
+    </div>
+</div>
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Chave Acesso</th>
+                    <th>NFC-e</th>
+                    <th>Venda</th>
+                    <th>Cliente</th>
+                    <th>Valor</th>
+                    <th>Emissao</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Acoes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nfce in nfces %}
+                <tr>
+                    <td><code style="font-size:.75rem;">{{ nfce.chave_acesso }}</code></td>
+                    <td><strong>{{ nfce.numero }}</strong></td>
+                    <td><a href="#">{{ nfce.venda.numero_venda }}</a></td>
+                    <td>{{ nfce.venda.cliente.nome|default:'--' }}</td>
+                    <td>R$ {{ nfce.venda.total|floatformat:2|intcomma }}</td>
+                    <td>{{ nfce.data_emissao|date:'d/m/Y H:i' }}</td>
+                    <td><span class="badge {% if nfce.tipo_emissao == '1' %}bg-info{% else %}bg-warning text-dark{% endif %}">{{ nfce.get_tipo_emissao_display }}</span></td>
+                    <td>
+                        <span class="badge {% if nfce.status_autorizacao == 'autorizada' %}bg-success{% elif nfce.status_autorizacao == 'cancelada' %}bg-secondary{% elif nfce.status_autorizacao == 'denegada' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                            {{ nfce.get_status_autorizacao_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'fiscal:nfce_detalhe' nfce.pk %}" class="btn btn-outline-primary"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'fiscal:nfce_danfe' nfce.pk %}" class="btn btn-outline-secondary" target="_blank"><i class="bi bi-printer"></i></a>
+                            {% if nfce.status_autorizacao == 'autorizada' or nfce.status_autorizacao == 'pendente' %}
+                            <form method="POST" action="{% url 'fiscal:nfce_cancelar' nfce.pk %}" class="d-inline" onsubmit="return confirm('Cancelar NFC-e {{ nfce.numero }}?')">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-danger"><i class="bi bi-x-circle"></i></button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="text-center py-4" style="color:var(--text-muted);">Nenhuma NFC-e encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

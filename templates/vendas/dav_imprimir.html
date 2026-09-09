@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAV {{ dav.numero }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @page { margin: 15mm; }
+        body { font-family: 'Courier New', monospace; font-size: 12px; color: #000; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { margin: 0; font-size: 18px; }
+        .header small { font-size: 10px; color: #555; }
+        .info-table { width: 100%; margin-bottom: 15px; }
+        .info-table td { padding: 2px 5px; vertical-align: top; }
+        .info-table td:first-child { font-weight: bold; width: 120px; }
+        table.items { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        table.items th { border-bottom: 2px solid #000; padding: 5px; text-align: left; font-size: 11px; }
+        table.items td { border-bottom: 1px solid #ccc; padding: 4px 5px; }
+        table.items .qty { text-align: center; }
+        table.items .price, table.items .total { text-align: right; }
+        .totals { width: 100%; }
+        .totals td { padding: 2px 5px; text-align: right; }
+        .totals td:first-child { font-weight: bold; width: 80%; }
+        .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #555; border-top: 1px dashed #ccc; padding-top: 10px; }
+        .barcode { text-align: center; margin: 15px 0; font-size: 24px; letter-spacing: 4px; }
+        .status-badge { display: inline-block; padding: 2px 10px; border: 1px solid #000; font-size: 10px; text-transform: uppercase; }
+        @media print {
+            .no-print { display: none; }
+            body { margin: 0; padding: 10mm; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print text-center mb-3">
+        <button onclick="window.print()" class="btn btn-primary btn-sm">Imprimir</button>
+        <button onclick="window.close()" class="btn btn-secondary btn-sm">Fechar</button>
+    </div>
+
+    <div class="header">
+        <h2>DOCUMENTO AUXILIAR DE VENDA</h2>
+        <small>Pré-Venda / DAV</small>
+    </div>
+
+    <div class="barcode">{{ dav.numero }}</div>
+
+    <table class="info-table">
+        <tr><td>DAV Nº:</td><td>{{ dav.numero }}</td></tr>
+        <tr><td>Data:</td><td>{{ dav.data_criacao|date:'d/m/Y H:i' }}</td></tr>
+        <tr><td>Cliente:</td><td>{{ dav.cliente|default:'Consumidor Final' }}</td></tr>
+        <tr><td>Vendedor:</td><td>{{ dav.vendedor.get_full_name|default:dav.vendedor.username|default:'---' }}</td></tr>
+        <tr><td>Status:</td><td><span class="status-badge">{{ dav.get_status_display|upper }}</span></td></tr>
+        {% if dav.observacoes %}
+        <tr><td>Obs:</td><td>{{ dav.observacoes }}</td></tr>
+        {% endif %}
+    </table>
+
+    <table class="items">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th class="qty">Qtd</th>
+                <th class="price">Preço Unit.</th>
+                <th class="price">Desconto</th>
+                <th class="total">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in dav.itens.all %}
+            <tr>
+                <td>{{ forloop.counter }} - {{ item.produto.nome }}</td>
+                <td class="qty">{{ item.quantidade|floatformat:3 }}</td>
+                <td class="price">R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                <td class="price">R$ {{ item.desconto|floatformat:2 }}</td>
+                <td class="total">R$ {{ item.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="totals">
+        <tr><td>Total Produtos:</td><td>R$ {{ dav.total_produtos|floatformat:2 }}</td></tr>
+        <tr><td>Total Descontos:</td><td>R$ {{ dav.total_descontos|floatformat:2 }}</td></tr>
+        <tr><td style="font-size:14px;font-weight:bold;">Total Geral:</td><td style="font-size:14px;font-weight:bold;">R$ {{ dav.total_geral|floatformat:2 }}</td></tr>
+    </table>
+
+    <div class="footer">
+        <p>Documento Auxiliar de Venda - pharmaMS</p>
+        <p>Este documento não possui valor fiscal. Serve como registro de pré-venda.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}DAV {{ dav.numero }} - pharmaMS{% endblock %}
+{% block page_title %}DAV {{ dav.numero }}{% endblock %}
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><strong>Informações do DAV</strong></span>
+                <span class="badge {% if dav.status == 'aberto' %}bg-primary{% elif dav.status == 'finalizado' %}bg-success{% else %}bg-secondary{% endif %} fs-6">{{ dav.get_status_display }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Número:</strong> {{ dav.numero }}</p>
+                        <p><strong>Data de Criação:</strong> {{ dav.data_criacao|date:'d/m/Y H:i' }}</p>
+                        <p><strong>Cliente:</strong> {{ dav.cliente|default:'---' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Vendedor:</strong> {{ dav.vendedor.get_full_name|default:dav.vendedor.username|default:'---' }}</p>
+                        {% if dav.venda %}
+                        <p><strong>Venda Gerada:</strong> <a href="{% url 'vendas:detalhe' dav.venda.pk %}">#{{ dav.venda.numero_venda }}</a></p>
+                        {% endif %}
+                        {% if dav.observacoes %}
+                        <p><strong>Observações:</strong> {{ dav.observacoes }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><strong>Itens</strong></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Desconto</th><th>Subtotal</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in dav.itens.all %}
+                        <tr>
+                            <td>{{ item.produto.nome }}</td>
+                            <td>{{ item.quantidade|floatformat:3 }}</td>
+                            <td>R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                            <td>R$ {{ item.desconto|floatformat:2 }}</td>
+                            <td>R$ {{ item.subtotal|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Total Produtos:</strong></td>
+                            <td>R$ {{ dav.total_produtos|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Total Descontos:</strong></td>
+                            <td>R$ {{ dav.total_descontos|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Total Geral:</strong></td>
+                            <td><strong>R$ {{ dav.total_geral|floatformat:2 }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2">
+    <a href="{% url 'vendas:davs' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+    {% if dav.status == 'aberto' %}
+    <a href="{% url 'vendas:dav_editar' dav.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil"></i> Editar</a>
+    <a href="{% url 'vendas:dav_finalizar' dav.pk %}" class="btn btn-success" onclick="return confirm('Finalizar este DAV e gerar venda?')"><i class="bi bi-check-lg"></i> Finalizar</a>
+    <a href="{% url 'vendas:dav_cancelar' dav.pk %}" class="btn btn-outline-danger" onclick="return confirm('Cancelar este DAV?')"><i class="bi bi-x-lg"></i> Cancelar</a>
+    {% endif %}
+    <a href="{% url 'vendas:dav_imprimir' dav.pk %}" class="btn btn-outline-info" target="_blank"><i class="bi bi-printer"></i> Imprimir</a>
+</div>
+{% endblock %}

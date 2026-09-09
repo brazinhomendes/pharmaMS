@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Nova Impressão de Etiquetas - pharmaMS{% endblock %}
+{% block page_title %}Nova Impressão de Etiquetas{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" id="form-etiquetas">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Modelo de Etiqueta *</label>
+                    <select name="modelo" class="form-select" required>
+                        <option value="">---</option>
+                        {% for m in modelos %}
+                        <option value="{{ m.id }}">{{ m.nome }} ({{ m.largura_mm }}x{{ m.altura_mm }}mm - {{ m.colunas }}x{{ m.linhas }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tipo de Origem</label>
+                    <select name="tipo_origem" class="form-select" id="tipo_origem" onchange="toggleOrigem()">
+                        <option value="produto">Produto</option>
+                        <option value="lote">Lote</option>
+                        <option value="classe">Classe Terapêutica</option>
+                        <option value="todos">Todos os Produtos</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Quantidade de Cópias</label>
+                    <input type="number" name="quantidade_copias" class="form-control" value="1" min="1">
+                </div>
+            </div>
+
+            <div class="row g-3 mt-2" id="div-produtos">
+                <div class="col-12">
+                    <label class="form-label">Selecionar Produtos</label>
+                    <select name="produtos" class="form-select" multiple size="10" id="select-produtos">
+                        {% for p in produtos %}
+                        <option value="{{ p.id }}">{{ p.nome }} - R$ {{ p.preco_venda|floatformat:2 }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Segure Ctrl para selecionar múltiplos produtos.</small>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-2 d-none" id="div-classe">
+                <div class="col-md-6">
+                    <label class="form-label">Classe Terapêutica</label>
+                    <select name="classe_terapeutica" class="form-select">
+                        <option value="">---</option>
+                        {% for c in classes %}
+                        <option value="{{ c.id }}">{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-printer"></i> Gerar Etiquetas
+                </button>
+                <a href="{% url 'cadastros:etiquetas_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function toggleOrigem() {
+    var tipo = document.getElementById('tipo_origem').value;
+    document.getElementById('div-produtos').classList.toggle('d-none', tipo === 'classe' || tipo === 'todos');
+    document.getElementById('div-classe').classList.toggle('d-none', tipo !== 'classe');
+    document.getElementById('select-produtos').required = tipo === 'produto' || tipo === 'lote';
+}
+</script>
+{% endblock %}

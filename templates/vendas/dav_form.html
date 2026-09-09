@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if dav %}Editar DAV {{ dav.numero }}{% else %}Novo DAV{% endif %} - pharmaMS{% endblock %}
+{% block page_title %}{% if dav %}Editar DAV {{ dav.numero }}{% else %}Novo DAV{% endif %}{% endblock %}
+{% block content %}
+<form method="post" id="davForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header"><strong>Informações</strong></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Número</label>
+                            <input type="text" class="form-control" value="{% if dav %}{{ dav.numero }}{% else %}{{ novo_numero }}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <input type="text" class="form-control" value="{% if dav %}{{ dav.get_status_display }}{% else %}Aberto{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Cliente</label>
+                            <select name="cliente" class="form-select" id="clienteSelect">
+                                <option value="">--- Selecione ---</option>
+                                {% for c in clientes %}
+                                <option value="{{ c.pk }}" {% if dav and dav.cliente_id == c.pk %}selected{% endif %}>{{ c.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vendedor</label>
+                            <select name="vendedor" class="form-select">
+                                <option value="">--- Selecione ---</option>
+                                {% for v in vendedores %}
+                                <option value="{{ v.pk }}" {% if dav and dav.vendedor_id == v.pk or not dav and v == user %}selected{% endif %}>{{ v.get_full_name|default:v.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observações</label>
+                            <textarea name="observacoes" class="form-control" rows="2">{{ dav.observacoes|default:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><strong>Itens</strong></span>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#produtoModal">
+                        <i class="bi bi-plus-lg"></i> Adicionar Produto
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="itensTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Qtd</th>
+                                    <th>Preço Unit.</th>
+                                    <th>Desconto</th>
+                                    <th>Subtotal</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itensBody">
+                                {% for item in dav.itens.all %}
+                                <tr>
+                                    <td>
+                                        {{ item.produto.nome }}
+                                        <input type="hidden" name="produto_id" value="{{ item.produto_id }}">
+                                        <input type="hidden" name="produto_nome" value="{{ item.produto.nome }}">
+                                    </td>
+                                    <td><input type="number" name="quantidade" step="0.001" class="form-control form-control-sm qty" style="width:100px" value="{{ item.quantidade }}"></td>
+                                    <td><input type="text" name="preco_unitario" class="form-control form-control-sm preco" style="width:120px" value="{{ item.preco_unitario|floatformat:2 }}"></td>
+                                    <td><input type="text" name="desconto" class="form-control form-control-sm desconto" style="width:120px" value="{{ item.desconto|floatformat:2 }}"></td>
+                                    <td><input type="text" name="subtotal" class="form-control form-control-sm subtotal" style="width:120px" value="{{ item.subtotal|floatformat:2 }}" readonly></td>
+                                    <td><button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="bi bi-trash"></i></button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-light">
+                                    <td colspan="4" class="text-end"><strong>Total Produtos:</strong></td>
+                                    <td><span id="totalProdutos">R$ 0,00</span></td>
+                                    <td></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td colspan="4" class="text-end"><strong>Total Descontos:</strong></td>
+                                    <td><span id="totalDescontos">R$ 0,00</span></td>
+                                    <td></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td colspan="4" class="text-end"><strong>Total Geral:</strong></td>
+                                    <td><strong><span id="totalGeral">R$ 0,00</span></strong></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> {% if dav %}Salvar{% else %}Criar DAV{% endif %}</button>
+                <a href="{% if dav %}{% url 'vendas:dav_detalhe' dav.pk %}{% else %}{% url 'vendas:davs' %}{% endif %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="produtoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Produto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" id="produtoSearch" class="form-control" placeholder="Buscar produto por nome ou código...">
+                </div>
+                <div class="table-responsive" style="max-height:400px">
+                    <table class="table table-hover table-sm" id="produtosTable">
+                        <thead class="table-light">
+                            <tr><th>Código</th><th>Nome</th><th>Preço</th><th>Estoque</th><th></th></tr>
+                        </thead>
+                        <tbody id="produtosBody">
+                            {% for p in produtos %}
+                            <tr class="produto-row" data-id="{{ p.pk }}" data-nome="{{ p.nome }}" data-preco="{{ p.preco_venda|floatformat:2 }}">
+                                <td>{{ p.codigo_barras|default:'---' }}</td>
+                                <td>{{ p.nome }}</td>
+                                <td>R$ {{ p.preco_venda|floatformat:2 }}</td>
+                                <td>{{ p.estoque_atual|default:'0' }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary add-produto"
+                                        data-id="{{ p.pk }}" data-nome="{{ p.nome }}" data-preco="{{ p.preco_venda|floatformat:2 }}">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.add-produto').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const id = this.dataset.id;
+        const nome = this.dataset.nome;
+        const preco = this.dataset.preco;
+        addItem(id, nome, preco);
+        bootstrap.Modal.getInstance(document.getElementById('produtoModal')).hide();
+    });
+});
+
+function addItem(id, nome, preco) {
+    const tbody = document.getElementById('itensBody');
+    const existing = tbody.querySelectorAll('input[name="produto_id"]');
+    for (let inp of existing) {
+        if (inp.value === id) {
+            const row = inp.closest('tr');
+            row.querySelector('.qty').value = parseFloat(row.querySelector('.qty').value || 1) + 1;
+            updateRow(row);
+            return;
+        }
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td>
+            ${nome}
+            <input type="hidden" name="produto_id" value="${id}">
+        </td>
+        <td><input type="number" name="quantidade" step="0.001" class="form-control form-control-sm qty" style="width:100px" value="1"></td>
+        <td><input type="text" name="preco_unitario" class="form-control form-control-sm preco" style="width:120px" value="${preco}"></td>
+        <td><input type="text" name="desconto" class="form-control form-control-sm desconto" style="width:120px" value="0.00"></td>
+        <td><input type="text" name="subtotal" class="form-control form-control-sm subtotal" style="width:120px" value="0.00" readonly></td>
+        <td><button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="bi bi-trash"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+    bindRowEvents(tr);
+    updateRow(tr);
+}
+
+function bindRowEvents(row) {
+    row.querySelector('.qty').addEventListener('input', () => updateRow(row));
+    row.querySelector('.preco').addEventListener('input', () => updateRow(row));
+    row.querySelector('.desconto').addEventListener('input', () => updateRow(row));
+    row.querySelector('.remove-item').addEventListener('click', () => {
+        row.remove();
+        updateTotals();
+    });
+}
+
+function updateRow(row) {
+    const qty = parseFloat(row.querySelector('.qty').value) || 0;
+    const preco = parseFloat(row.querySelector('.preco').value.replace(',', '.')) || 0;
+    const desc = parseFloat(row.querySelector('.desconto').value.replace(',', '.')) || 0;
+    const sub = qty * preco - desc;
+    row.querySelector('.subtotal').value = sub.toFixed(2);
+    updateTotals();
+}
+
+function updateTotals() {
+    let totalProd = 0, totalDesc = 0, totalGeral = 0;
+    document.querySelectorAll('#itensBody tr').forEach(row => {
+        const qty = parseFloat(row.querySelector('.qty').value) || 0;
+        const preco = parseFloat(row.querySelector('.preco').value.replace(',', '.')) || 0;
+        const desc = parseFloat(row.querySelector('.desconto').value.replace(',', '.')) || 0;
+        const sub = parseFloat(row.querySelector('.subtotal').value) || 0;
+        totalProd += qty * preco;
+        totalDesc += desc;
+        totalGeral += sub;
+    });
+    document.getElementById('totalProdutos').textContent = 'R$ ' + totalProd.toFixed(2);
+    document.getElementById('totalDescontos').textContent = 'R$ ' + totalDesc.toFixed(2);
+    document.getElementById('totalGeral').textContent = 'R$ ' + totalGeral.toFixed(2);
+}
+
+document.querySelectorAll('#itensBody tr').forEach(bindRowEvents);
+
+document.getElementById('produtoSearch').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.produto-row').forEach(row => {
+        const nome = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const cod = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        row.style.display = nome.includes(q) || cod.includes(q) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

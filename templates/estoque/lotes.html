@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Lotes - pharmaMS{% endblock %}
+{% block page_title %}Lotes{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <span class="text-muted">Gerencie os lotes dos produtos.</span>
+    <a href="{% url 'estoque:lote_novo' %}" class="btn btn-pharma"><i class="bi bi-plus-lg"></i> Novo Lote</a>
+</div>
+
+<div class="card-dashboard p-0">
+    <table class="table table-pharma mb-0">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Cód. Lote</th>
+                <th>Validade</th>
+                <th>Qtd</th>
+                <th>Preço Custo</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lote in lotes %}
+            <tr>
+                <td>{{ lote.produto.nome }}</td>
+                <td><code>{{ lote.codigo_lote }}</code></td>
+                <td>{{ lote.data_validade|date:"d/m/Y" }}</td>
+                <td>{{ lote.quantidade }}</td>
+                <td>R$ {{ lote.preco_custo|floatformat:2 }}</td>
+                <td>
+                    {% if lote.esta_vencido %}
+                    <span class="badge bg-danger">Vencido</span>
+                    {% elif lote.dias_para_vencer <= 30 %}
+                    <span class="badge bg-warning text-dark">{{ lote.dias_para_vencer }} dias</span>
+                    {% else %}
+                    <span class="badge bg-success">OK</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">Nenhum lote cadastrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

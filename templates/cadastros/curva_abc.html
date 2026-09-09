@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}Curva ABC - pharmaMS{% endblock %}
+{% block page_title %}Curva ABC{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Classificação ABC de Produtos</h5>
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCalcular">
+        <i class="bi bi-calculator"></i> Calcular Agora
+    </button>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-body text-center py-3">
+                <div class="fs-1 fw-bold text-success">{{ total_a }}</div>
+                <div class="text-muted small">Classe A</div>
+                <span class="badge bg-success mt-1">80% do faturamento</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-body text-center py-3">
+                <div class="fs-1 fw-bold text-warning">{{ total_b }}</div>
+                <div class="text-muted small">Classe B</div>
+                <span class="badge bg-warning text-dark mt-1">15% do faturamento</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-secondary">
+            <div class="card-body text-center py-3">
+                <div class="fs-1 fw-bold text-secondary">{{ total_c }}</div>
+                <div class="text-muted small">Classe C</div>
+                <span class="badge bg-secondary mt-1">5% do faturamento</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-info">
+            <div class="card-body text-center py-3">
+                <div class="text-muted small">Última Classificação</div>
+                <div class="fs-5 fw-bold mt-2">
+                    {% if ultima_classificacao %}
+                        {{ ultima_classificacao.data_calculo|date:"d/m/Y" }}
+                    {% else %}
+                        Nunca
+                    {% endif %}
+                </div>
+                {% if ultima_classificacao %}
+                <div class="text-muted small mt-1">
+                    {{ ultima_classificacao.total_produtos }} produtos | R$ {{ ultima_classificacao.total_vendas_periodo|floatformat:2 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge bg-success">A</span>
+        <strong>Classe A</strong>
+        <span class="text-muted small">(80% do faturamento - {{ total_a }} produtos)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço Venda</th>
+                        <th>Laboratório</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos_a %}
+                    <tr>
+                        <td><a href="{% url 'cadastros:produto_detalhe' p.id %}">{{ p.nome }}</a></td>
+                        <td>R$ {{ p.preco_venda|floatformat:2 }}</td>
+                        <td>{{ p.laboratorio|default:'-' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center text-muted">Nenhum produto classe A.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge bg-warning text-dark">B</span>
+        <strong>Classe B</strong>
+        <span class="text-muted small">(15% do faturamento - {{ total_b }} produtos)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço Venda</th>
+                        <th>Laboratório</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos_b %}
+                    <tr>
+                        <td><a href="{% url 'cadastros:produto_detalhe' p.id %}">{{ p.nome }}</a></td>
+                        <td>R$ {{ p.preco_venda|floatformat:2 }}</td>
+                        <td>{{ p.laboratorio|default:'-' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center text-muted">Nenhum produto classe B.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge bg-secondary">C</span>
+        <strong>Classe C</strong>
+        <span class="text-muted small">(5% do faturamento - {{ total_c }} produtos)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço Venda</th>
+                        <th>Laboratório</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos_c %}
+                    <tr>
+                        <td><a href="{% url 'cadastros:produto_detalhe' p.id %}">{{ p.nome }}</a></td>
+                        <td>R$ {{ p.preco_venda|floatformat:2 }}</td>
+                        <td>{{ p.laboratorio|default:'-' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center text-muted">Nenhum produto classe C.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCalcular" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'cadastros:curva_abc_calcular' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Calcular Curva ABC</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Data Início</label>
+                        <input type="date" name="data_inicio" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" name="data_fim" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Calcular</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

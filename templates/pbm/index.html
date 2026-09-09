@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}PBMs - pharmaMS{% endblock %}
+{% block page_title %}Convênios / PBMs{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:var(--primary-light);">
+                <i class="bi bi-building" style="color:var(--primary);font-size:1.3rem;"></i>
+            </div>
+            <div>
+                <div class="stat-number">{{ operadoras|length }}</div>
+                <div class="stat-label">Operadoras</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:var(--warning-light);">
+                <i class="bi bi-clock" style="color:var(--warning);font-size:1.3rem;"></i>
+            </div>
+            <div>
+                <div class="stat-number">{{ pendentes }}</div>
+                <div class="stat-label">Pendentes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:#d1fae5;">
+                <i class="bi bi-check-circle" style="color:var(--success);font-size:1.3rem;"></i>
+            </div>
+            <div>
+                <div class="stat-number">{{ autorizadas }}</div>
+                <div class="stat-label">Autorizadas</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'pbm:transacoes' %}" class="text-decoration-none">
+            <div class="card-dashboard p-3 d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:#fce7f3;">
+                    <i class="bi bi-arrow-left-right" style="color:#ec4899;font-size:1.3rem;"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Ver Transações</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for op in operadoras %}
+    <div class="col-xl-3 col-md-4 col-sm-6">
+        <div class="card-dashboard p-3 text-center">
+            <div class="stat-number" style="font-size:1.5rem;">{{ op.get_tipo_display }}</div>
+            <div class="stat-label">{{ op.nome }}</div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><p class="text-center" style="color:var(--text-muted);">Nenhuma operadora cadastrada.</p></div>
+    {% endfor %}
+</div>
+
+{% if transacoes_recentes %}
+<h6 class="fw-semibold mt-4 mb-3">Transações Recentes</h6>
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Operadora</th>
+                    <th>Venda</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transacoes_recentes %}
+                <tr>
+                    <td>{{ t.operadora.nome }}</td>
+                    <td>#{{ t.venda.numero_venda }}</td>
+                    <td>R$ {{ t.valor_total|floatformat:2|intcomma }}</td>
+                    <td>
+                        <span class="badge {% if t.status == 'autorizada' %}bg-success{% elif t.status == 'negada' or t.status == 'cancelada' %}bg-danger{% elif t.status == 'processada' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">
+                            {{ t.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ t.criado_em|date:'d/m/Y H:i' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

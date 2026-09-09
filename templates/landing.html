@@ -1,0 +1,442 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pharmaMS - Sistema de Gestao Farmaceutica</title>
+    <meta name="description" content="Sistema completo de gestao para farmacias. PDV, NF-e, Estoque, SNGPC, Delivery e muito mais.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{% static 'css/landing.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <div class="brand-icon"><i class="bi bi-capsule"></i></div>
+            <span>pharmaMS</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <i class="bi bi-list text-white fs-4"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#features">Funcionalidades</a></li>
+                <li class="nav-item"><a class="nav-link" href="#modules">Modulos</a></li>
+                <li class="nav-item"><a class="nav-link" href="#plans">Planos</a></li>
+                <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                <li class="nav-item ms-lg-3"><a class="btn btn-light btn-sm px-3" href="/usuarios/login/">Entrar</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section">
+    <div class="hero-bg">
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-orb hero-orb-3"></div>
+    </div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-badge">
+                    <i class="bi bi-shield-check me-1"></i> LGPD Compliant &middot; SPED Fiscal &middot; NFC-e
+                </div>
+                <h1 class="hero-title">
+                    Gestao farmaceutica<br>
+                    <span class="gradient-text">inteligente e completa</span>
+                </h1>
+                <p class="hero-subtitle">
+                    PDV, NF-e/NFC-e, Estoque, SNGPC, PBM, Delivery, CRM e muito mais.
+                    Tudo em um so sistema para sua farmacia funcionar no automato.
+                </p>
+                <div class="hero-actions">
+                    <a href="#plans" class="btn btn-hero-primary btn-lg">
+                        Comece Gratis <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#features" class="btn btn-hero-secondary btn-lg">
+                        <i class="bi bi-play-circle me-2"></i> Ver Demonstracao
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-number">15+</div>
+                        <div class="hero-stat-label">Modulos</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-number">100%</div>
+                        <div class="hero-stat-label">Web</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-number">24/7</div>
+                        <div class="hero-stat-label">Acesso</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="hero-visual">
+                    <div class="dashboard-mockup">
+                        <div class="mockup-header">
+                            <div class="mockup-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <div class="mockup-title">pharmaMS Dashboard</div>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mockup-sidebar">
+                                <div class="mockup-menu-item active"><i class="bi bi-speedometer2"></i></div>
+                                <div class="mockup-menu-item"><i class="bi bi-capsule"></i></div>
+                                <div class="mockup-menu-item"><i class="bi bi-cart"></i></div>
+                                <div class="mockup-menu-item"><i class="bi bi-receipt"></i></div>
+                                <div class="mockup-menu-item"><i class="bi bi-graph-up"></i></div>
+                            </div>
+                            <div class="mockup-content">
+                                <div class="mockup-stat-row">
+                                    <div class="mockup-stat" style="background:rgba(99,102,241,0.1);">
+                                        <div style="color:#6366f1;font-size:1.5rem;">R$ 4.280</div>
+                                        <div style="font-size:0.65rem;color:#94a3b8;">Vendas Hoje</div>
+                                    </div>
+                                    <div class="mockup-stat" style="background:rgba(16,185,129,0.1);">
+                                        <div style="color:#10b981;font-size:1.5rem;">142</div>
+                                        <div style="font-size:0.65rem;color:#94a3b8;">Produtos</div>
+                                    </div>
+                                    <div class="mockup-stat" style="background:rgba(139,92,246,0.1);">
+                                        <div style="color:#8b5cf6;font-size:1.5rem;">89</div>
+                                        <div style="font-size:0.65rem;color:#94a3b8;">Clientes</div>
+                                    </div>
+                                </div>
+                                <div class="mockup-chart">
+                                    <div class="mockup-bar" style="height:40%"></div>
+                                    <div class="mockup-bar" style="height:65%"></div>
+                                    <div class="mockup-bar" style="height:45%"></div>
+                                    <div class="mockup-bar" style="height:80%"></div>
+                                    <div class="mockup-bar" style="height:55%"></div>
+                                    <div class="mockup-bar" style="height:90%"></div>
+                                    <div class="mockup-bar" style="height:70%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge"><i class="bi bi-stars me-1"></i> Funcionalidades</span>
+            <h2>Tudo que sua farmacia precisa</h2>
+            <p>Um sistema completo para gestao moderna, com automacao inteligente e conformidade fiscal.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--primary-subtle);color:var(--primary);"><i class="bi bi-cart-check"></i></div>
+                    <h5>PDV Completo</h5>
+                    <p>Ponto de venda rapido com abertura de caixa, formas de pagamento multiplo, promocoes automaticas e impressao de cupom.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--success-subtle);color:var(--success);"><i class="bi bi-receipt"></i></div>
+                    <h5>NF-e / NFC-e</h5>
+                    <p>Emissao direta de Nota Fiscal Eletronica e NFC-e com XML, DANFE e integracao SEFAZ. Validacao automatica.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--danger-subtle);color:var(--danger);"><i class="bi bi-capsule"></i></div>
+                    <h5>SNGPC</h5>
+                    <p>Controle de medicamentos controlados, receituarios, movimentacoes e relatorios para o SNGPC da ANVISA.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--warning-subtle);color:var(--warning);"><i class="bi bi-box-seam"></i></div>
+                    <h5>Estoque Inteligente</h5>
+                    <p>Controle por lotes, validade, estoque minimo, curva ABC e sugestao de compra automatica baseada em vendas.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--info-subtle);color:var(--info);"><i class="bi bi-truck"></i></div>
+                    <h5>Delivery</h5>
+                    <p>Gestao completa de entregas com status em tempo real, integracao ao PDV e tracking para o cliente.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--purple-subtle);color:var(--purple);"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h5>Relatorios Avancados</h5>
+                    <p>Dashboard com KPIs, graficos de vendas, ranking de vendedores, top produtos e analise financeira.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(236,72,153,0.1);color:#ec4899;"><i class="bi bi-credit-card"></i></div>
+                    <h5>PBM</h5>
+                    <p>Integracao com programas de beneficio em medicamentos: Farmacia Popular, Vidalink, Orizon e mais.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee;"><i class="bi bi-whatsapp"></i></div>
+                    <h5>WhatsApp</h5>
+                    <p>Envio automatico de NF-e, confirmacao de pedidos e promocoes via WhatsApp Business API.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:rgba(163,230,53,0.1);color:#a3e635;"><i class="bi bi-shield-lock"></i></div>
+                    <h5>Seguranca & LGPD</h5>
+                    <p>Rate limiting, auditoria de acessos, criptografia, consentimento LGPD e backup automatico.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODULES -->
+<section class="section section-dark" id="modules">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge section-badge-light"><i class="bi bi-grid-3x3-gap me-1"></i> Modulos</span>
+            <h2>15 modulos integrados</h2>
+            <p>Cada modulo se comunica com os outros em tempo real.</p>
+        </div>
+        <div class="modules-grid">
+            <div class="module-item"><i class="bi bi-speedometer2"></i> Dashboard</div>
+            <div class="module-item"><i class="bi bi-capsule"></i> Cadastros</div>
+            <div class="module-item"><i class="bi bi-box-seam"></i> Estoque</div>
+            <div class="module-item"><i class="bi bi-cart"></i> PDV</div>
+            <div class="module-item"><i class="bi bi-bag-check"></i> Vendas</div>
+            <div class="module-item"><i class="bi bi-truck"></i> Delivery</div>
+            <div class="module-item"><i class="bi bi-receipt"></i> Fiscal</div>
+            <div class="module-item"><i class="bi bi-file-earmark-medical"></i> SNGPC</div>
+            <div class="module-item"><i class="bi bi-credit-card"></i> PBM</div>
+            <div class="module-item"><i class="bi bi-currency-dollar"></i> Financeiro</div>
+            <div class="module-item"><i class="bi bi-people"></i> CRM</div>
+            <div class="module-item"><i class="bi bi-whatsapp"></i> WhatsApp</div>
+            <div class="module-item"><i class="bi bi-bar-chart-line"></i> Relatorios</div>
+            <div class="module-item"><i class="bi bi-person-gear"></i> Usuarios</div>
+            <div class="module-item"><i class="bi bi-gear"></i> Configuracoes</div>
+        </div>
+    </div>
+</section>
+
+<!-- PLANS -->
+<section class="section" id="plans">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge"><i class="bi bi-tag me-1"></i> Planos</span>
+            <h2>Escolha o plano ideal</h2>
+            <p>Comece gratis e escale conforme sua farmacia cresce.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4">
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <div class="plan-name">Basico</div>
+                        <div class="plan-price">Grátis</div>
+                        <div class="plan-period">para sempre</div>
+                    </div>
+                    <div class="plan-features">
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>PDV completo</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Estoque com lotes</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Cadastros ilimitados</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Relatorios basicos</div>
+                        <div class="plan-feature disabled"><i class="bi bi-x-lg text-muted me-2"></i>NF-e / NFC-e</div>
+                        <div class="plan-feature disabled"><i class="bi bi-x-lg text-muted me-2"></i>SNGPC</div>
+                        <div class="plan-feature disabled"><i class="bi bi-x-lg text-muted me-2"></i>Delivery</div>
+                        <div class="plan-feature disabled"><i class="bi bi-x-lg text-muted me-2"></i>WhatsApp</div>
+                    </div>
+                    <a href="#contact" class="btn btn-outline-primary w-100 mt-auto">Comecar Gratis</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="plan-card plan-featured">
+                    <div class="plan-badge">Mais Popular</div>
+                    <div class="plan-header">
+                        <div class="plan-name">Profissional</div>
+                        <div class="plan-price">R$ 149<span style="font-size:0.5em;">/mes</span></div>
+                        <div class="plan-period">por farmacia</div>
+                    </div>
+                    <div class="plan-features">
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Tudo do Basico</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>NF-e / NFC-e ilimitadas</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>SNGPC completo</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Delivery integrado</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>PBM</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Relatorios avancados</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Suporte prioritario</div>
+                        <div class="plan-feature disabled"><i class="bi bi-x-lg text-muted me-2"></i>WhatsApp API</div>
+                    </div>
+                    <a href="#contact" class="btn btn-hero-primary w-100 mt-auto">Assinar Agora</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <div class="plan-name">Enterprise</div>
+                        <div class="plan-price">R$ 349<span style="font-size:0.5em;">/mes</span></div>
+                        <div class="plan-period">por farmacia</div>
+                    </div>
+                    <div class="plan-features">
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Tudo do Profissional</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>WhatsApp API</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>CRM completo</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Multi-filial</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>SPED Contabil</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>API aberta</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Backup diario</div>
+                        <div class="plan-feature"><i class="bi bi-check-lg text-success me-2"></i>Suporte 24/7</div>
+                    </div>
+                    <a href="#contact" class="btn btn-outline-primary w-100 mt-auto">Falar com Vendas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section-dark" id="faq">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge section-badge-light"><i class="bi bi-question-circle me-1"></i> FAQ</span>
+            <h2>Perguntas frequentes</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">O sistema emite NF-e e NFC-e?</button></h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion"><div class="accordion-body">Sim! O pharmaMS emite NF-e (nota fiscal eletronica para entregas) e NFC-e (nota fiscal do consumidor final) direto pelo sistema, com geracao de XML, envio a SEFAZ e impressao do DANFE.</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Preciso de certificado digital?</button></h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Sim, para emissao de NF-e/NFC-e voce precisa de um certificado digital A1 (padrao da industria). O pharmaMS facilita o upload e gerenciamento do certificado.</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">Funciona em qualquer dispositivo?</button></h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Sim! O pharmaMS e 100% web, funciona em computadores, tablets e smartphones. Funciona em qualquer navegador moderno (Chrome, Firefox, Safari, Edge).</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">Meus dados estao seguros?</button></h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Sim! Utilizamos HTTPS, backup automatico diario, rate limiting, auditoria de acessos e somos compatíveis com a LGPD (Lei Geral de Protecao de Dados).</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">Posso migrar de outro sistema?</button></h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Sim! Oferecemos assistencia para migracao de dados de outros sistemas como Dimdim, Pague Menos, Real Controle e outros. Entre em contato com nosso suporte.</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+    <div class="container text-center">
+        <h2>Pronto para modernizar sua farmacia?</h2>
+        <p class="cta-subtitle">Comece gratuitamente ou fale com nossa equipe de vendas.</p>
+        <div class="cta-actions">
+            <a href="/usuarios/login/" class="btn btn-hero-primary btn-lg">
+                Acessar o Sistema <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+            <a href="mailto:contato@pharmams.com.br" class="btn btn-hero-secondary btn-lg">
+                <i class="bi bi-envelope me-2"></i> Falar com Vendas
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="brand-icon" style="width:32px;height:32px;border-radius:8px;font-size:0.9rem;"><i class="bi bi-capsule"></i></div>
+                    <span class="fw-bold" style="font-size:1.1rem;">pharmaMS</span>
+                </div>
+                <p style="font-size:0.85rem;color:var(--text-secondary);">Sistema de gestao farmaceutica completo, moderno e seguro. Feito para farmaceuticos que querem eficiencia.</p>
+            </div>
+            <div class="col-lg-2">
+                <h6 class="fw-bold mb-3">Produto</h6>
+                <ul class="footer-links">
+                    <li><a href="#features">Funcionalidades</a></li>
+                    <li><a href="#modules">Modulos</a></li>
+                    <li><a href="#plans">Planos</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3">
+                <h6 class="fw-bold mb-3">Legal</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Politica de Privacidade</a></li>
+                    <li><a href="#">Termos de Uso</a></li>
+                    <li><a href="#">LGPD</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3">
+                <h6 class="fw-bold mb-3">Contato</h6>
+                <ul class="footer-links">
+                    <li><i class="bi bi-envelope me-2"></i>contato@pharmams.com.br</li>
+                    <li><i class="bi bi-whatsapp me-2"></i>(11) 99999-0000</li>
+                </ul>
+            </div>
+        </div>
+        <hr style="border-color:var(--border-color);margin:2rem 0;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <small style="color:var(--text-muted);">&copy; 2026 pharmaMS. Todos os direitos reservados.</small>
+            <div class="d-flex gap-3">
+                <a href="#" style="color:var(--text-muted);"><i class="bi bi-github fs-5"></i></a>
+                <a href="#" style="color:var(--text-muted);"><i class="bi bi-instagram fs-5"></i></a>
+                <a href="#" style="color:var(--text-muted);"><i class="bi bi-linkedin fs-5"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Navbar scroll effect
+window.addEventListener('scroll', function() {
+    document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// Animate on scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-card, .module-item, .plan-card, .accordion-item').forEach(el => {
+    observer.observe(el);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DANFE NFC-e {{ nfce.numero }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @page { margin: 0; size: 80mm 297mm; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Inconsolata', monospace;
+            font-size: 10px;
+            width: 80mm;
+            min-height: 100mm;
+            padding: 4mm 5mm;
+            background: #fff;
+            color: #000;
+        }
+        .center { text-align: center; }
+        .bold { font-weight: 700; }
+        .title { font-size: 14px; font-weight: 900; margin-bottom: 2px; }
+        .subtitle { font-size: 9px; color: #555; }
+        .divider { border-top: 1px dashed #333; margin: 4px 0; }
+        .divider-solid { border-top: 1px solid #333; margin: 4px 0; }
+        .line { display: flex; justify-content: space-between; padding: 1px 0; font-size: 9px; }
+        .line span:last-child { text-align: right; font-weight: 600; }
+        table.items { width: 100%; border-collapse: collapse; font-size: 8px; margin: 3px 0; }
+        table.items th { text-align: left; font-size: 7px; color: #555; border-bottom: 1px solid #333; padding: 2px 1px; }
+        table.items td { padding: 1px; border-bottom: 1px dotted #ccc; vertical-align: top; }
+        table.items td:last-child, table.items th:last-child { text-align: right; }
+        table.items td:nth-child(3), table.items th:nth-child(3) { text-align: center; }
+        .barcode { font-family: 'Inconsolata', monospace; font-size: 9px; letter-spacing: 1px; word-break: break-all; margin: 3px 0; }
+        .qr-placeholder { width: 40mm; height: 40mm; border: 3px solid #000; margin: 4px auto; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 7px; color: #555; }
+        .totals-table { width: 100%; font-size: 9px; margin: 3px 0; }
+        .totals-table td { padding: 2px 0; }
+        .totals-table td:last-child { text-align: right; font-weight: 700; }
+        .protocolo-box { border: 1px solid #000; padding: 4px; margin: 4px 0; text-align: center; font-size: 10px; font-weight: 700; }
+        .contingencia-badge { background: #000; color: #fff; padding: 2px 8px; font-size: 8px; font-weight: 700; display: inline-block; }
+        @media print {
+            body { margin: 0; padding: 4mm 5mm; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="text-align:center;margin-bottom:6px;">
+        <button onclick="window.print()" style="padding:8px 24px;font-size:14px;cursor:pointer;background:#7c3aed;color:#fff;border:none;border-radius:6px;">Imprimir DANFE</button>
+        <hr class="divider">
+    </div>
+
+    <div class="center">
+        <div class="title">{{ emitente.nome }}</div>
+        <div class="subtitle">{{ emitente.cnpj }}</div>
+        <div class="subtitle">{{ emitente.endereco }}, {{ emitente.bairro }} - {{ emitente.cidade }}/{{ emitente.uf }}</div>
+        <div class="subtitle">{{ emitente.telefone }}</div>
+        <hr class="divider-solid">
+    </div>
+
+    <div class="center">
+        {% if nfce.tipo_emissao == '2' %}
+        <div class="contingencia-badge">CONTINGENCIA</div>
+        {% endif %}
+        <div style="font-size:16px;font-weight:900;margin:2px 0;">DANFE NFC-e</div>
+        <div class="subtitle">Documento Auxiliar da Nota Fiscal do Consumidor Eletronica</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="line"><span>NFC-e N:</span><span>{{ nfce.numero }}</span></div>
+    <div class="line"><span>Serie:</span><span>{{ nfce.serie }}</span></div>
+    <div class="line"><span>Data:</span><span>{{ nfce.data_emissao|date:'d/m/Y H:i:s' }}</span></div>
+
+    <hr class="divider">
+
+    <div class="line"><span>CHAVE DE ACESSO</span></div>
+    <div class="barcode center">{{ nfce.chave_acesso }}</div>
+
+    <hr class="divider">
+
+    <div class="line"><span>CONSUMIDOR</span></div>
+    <div class="line"><span>{{ cliente_nome }}</span></div>
+    {% if cliente_cpf %}
+    <div class="line"><span>CPF/CNPJ:</span><span>{{ cliente_cpf }}</span></div>
+    {% endif %}
+
+    <hr class="divider">
+
+    <table class="items">
+        <thead>
+            <tr>
+                <th style="width:10%;">Cod</th>
+                <th style="width:40%;">Descricao</th>
+                <th style="width:10%;">Qtd</th>
+                <th style="width:18%;">Valor</th>
+                <th style="width:22%;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.codigo }}</td>
+                <td>{{ item.nome|truncatechars:25 }}</td>
+                <td>{{ item.qtd }}</td>
+                <td>R$ {{ item.vl_unit|floatformat:2 }}</td>
+                <td>R$ {{ item.vl_total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="line"><span>Qtd. total de itens:</span><span>{{ items|length }}</span></div>
+
+    <hr class="divider">
+
+    <table class="totals-table">
+        <tr><td>Subtotal</td><td>R$ {{ venda.subtotal|floatformat:2|intcomma }}</td></tr>
+        {% if venda.desconto > 0 %}
+        <tr><td>Desconto</td><td>R$ {{ venda.desconto|floatformat:2|intcomma }}</td></tr>
+        {% endif %}
+        <tr><td style="font-size:12px;font-weight:900;">VALOR TOTAL</td><td style="font-size:12px;font-weight:900;">R$ {{ venda.total|floatformat:2|intcomma }}</td></tr>
+    </table>
+
+    <div class="line"><span>Forma Pagamento:</span><span>{{ venda.get_forma_pagamento_display }}</span></div>
+
+    <hr class="divider">
+
+    {% if nfce.protocolo %}
+    <div class="protocolo-box">Protocolo: {{ nfce.protocolo }}</div>
+    {% endif %}
+
+    <div class="center">
+        <div style="font-size:7px;color:#555;margin:2px 0;">Consulte pela Chave de Acesso em</div>
+        <div style="font-size:7px;color:#555;">www.sefaz.fazenda.gov.br/consulta</div>
+    </div>
+
+    <div class="qr-placeholder">
+        QR CODE<br>
+        (consulte o XML<br>
+        para validacao)
+    </div>
+
+    <hr class="divider-solid">
+
+    <div class="center subtitle">
+        <div>{{ emitente.nome }}</div>
+        <div>{{ emitente.cnpj }} | IE: {{ emitente.ie }}</div>
+        <div>{{ emitente.endereco }}, {{ emitente.bairro }} - {{ emitente.cidade }}/{{ emitente.uf }}</div>
+    </div>
+
+    <div class="center" style="margin-top:6px;font-size:7px;color:#999;">
+        pharmaMS - NFC-e {{ nfce.numero }}
+    </div>
+</body>
+</html>

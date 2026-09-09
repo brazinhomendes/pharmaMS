@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Relatórios SNGPC - pharmaMS{% endblock %}
+{% block page_title %}Relatórios SNGPC{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalGerar">
+        <i class="bi bi-plus-lg"></i> Gerar Relatório
+    </button>
+</div>
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Período</th>
+                    <th>Processado</th>
+                    <th>Arquivo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rel in relatorios %}
+                <tr>
+                    <td><span class="badge bg-dark">{{ rel.get_tipo_display }}</span></td>
+                    <td>{{ rel.periodo_inicio|date:'d/m/Y' }} a {{ rel.periodo_fim|date:'d/m/Y' }}</td>
+                    <td>
+                        {% if rel.processado %}
+                        <span class="badge bg-success">Sim</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Não</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if rel.arquivo_xml %}
+                        <a href="{{ rel.arquivo_xml.url }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></a>
+                        {% else %}
+                        <span style="color:var(--text-muted);">---</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center py-4" style="color:var(--text-muted);">Nenhum relatório encontrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modalGerar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'sngpc:gerar_relatorio' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Gerar Relatório SNGPC</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select name="tipo" class="form-select">
+                            <option value="bspo">BSPO</option>
+                            <option value="bmpo">BMPO</option>
+                            <option value="rmnra">RMNRA</option>
+                            <option value="rmnrb">RMNRB</option>
+                            <option value="inventario">Inventário</option>
+                        </select>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Período Início</label>
+                            <input type="date" name="periodo_inicio" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Período Fim</label>
+                            <input type="date" name="periodo_fim" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Gerar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

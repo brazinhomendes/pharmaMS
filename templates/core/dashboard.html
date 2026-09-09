@@ -1,0 +1,707 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+{% block title %}Dashboard - pharmaMS{% endblock %}
+{% block page_title %}Visão Geral{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ─── DASHBOARD ENHANCEMENTS ─── */
+.hero-greeting {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+    border-radius: var(--radius-2xl);
+    padding: 2.25rem 2.75rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-greeting::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.15) 0%, transparent 50%);
+    animation: heroGlow 6s ease-in-out infinite alternate;
+}
+
+@keyframes heroGlow {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+}
+
+.hero-greeting > * { position: relative; z-index: 1; }
+.hero-greeting h4 { 
+    font-weight: 800; 
+    letter-spacing: -0.6px; 
+    margin: 0; 
+    font-size: 1.75rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.hero-greeting p { 
+    margin: 6px 0 0; 
+    font-size: 1.05rem; 
+    opacity: 0.9;
+    max-width: 500px;
+}
+.hero-date {
+    font-size: 0.9rem; 
+    opacity: 0.95;
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end; 
+    gap: 0.6rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.15);
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+}
+
+.item-row {
+    display: flex; 
+    align-items: center; 
+    gap: 14px;
+    padding: 0.85rem 0; 
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+    transition: all 0.2s ease;
+}
+.item-row:last-child { border-bottom: none; }
+.item-row:hover {
+    background-color: var(--primary-subtle);
+    transform: translateX(4px);
+}
+.item-row .ir-icon {
+    width: 44px; 
+    height: 44px; 
+    border-radius: var(--radius-lg);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 1.1rem; 
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+.item-row .ir-info { 
+    flex: 1; 
+    min-width: 0; 
+}
+.item-row .ir-info .ir-title { 
+    font-weight: 600; 
+    font-size: 0.95rem; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    transition: color 0.2s ease;
+}
+.item-row:hover .ir-info .ir-title { color: var(--text-color); }
+.item-row .ir-info .ir-meta { 
+    font-size: 0.8rem; 
+    color: var(--text-muted);
+}
+.item-row .ir-value { 
+    font-weight: 700; 
+    font-size: 0.95rem; 
+    white-space: nowrap; 
+    font-variant-numeric: tabular-nums;
+    transition: color 0.2s ease;
+}
+
+.empty-sm { 
+    text-align: center; 
+    padding: 3rem 1.5rem; 
+}
+.empty-sm i { 
+    font-size: 2.5rem; 
+    color: var(--text-muted); 
+    opacity: 0.4; 
+    margin-bottom: 1.25rem; 
+}
+.empty-sm p { 
+    font-size: 0.95rem; 
+    color: var(--text-muted); 
+    margin: 8px 0 0; 
+    font-weight: 500; 
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+.scroll-list { 
+    max-height: 380px; 
+    overflow-y: auto; 
+    padding-right: 4px; 
+    scrollbar-width: thin;
+}
+.scroll-list::-webkit-scrollbar { 
+    width: 6px; 
+}
+.scroll-list::-webkit-scrollbar-track { 
+    background: transparent; 
+}
+.scroll-list::-webkit-scrollbar-thumb { 
+    background-color: var(--border-strong);
+    border-radius: 3px;
+}
+
+/* Enhanced stat boxes */
+.stat-box {
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-2xl);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-xs);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+.stat-box:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
+    transform: translateY(-4px) scale(1.02);
+}
+.stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.stat-box:hover::before { opacity: 1; }
+.stat-box .sb-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+.stat-box:hover .sb-icon { 
+    transform: scale(1.05) rotate(5deg); 
+}
+.stat-box .sb-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.8px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-color);
+    transition: color 0.2s ease;
+}
+.stat-box:hover .sb-value { color: var(--primary); }
+.stat-box .sb-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* Enhanced cards */
+.card-dash, .card-dashboard {
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xs);
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+.card-dash:hover, .card-dashboard:hover {
+    box-shadow: var(--shadow-xl);
+    border-color: var(--border-strong);
+    transform: translateY(-8px);
+}
+.card-dash::before, .card-dashboard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.card-dash:hover::before, .card-dashboard:hover::before { opacity: 1; }
+.card-dash .card-head {
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 1rem;
+    background: color-mix(in srgb, var(--card-bg) 95%, transparent);
+}
+.card-dash .card-body {
+    padding: 1.75rem;
+}
+
+/* Enhanced badges */
+.badge {
+    font-weight: 600;
+    padding: 0.45em 0.9em;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.badge-soft-primary {
+    background: var(--primary-subtle);
+    color: var(--primary);
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+}
+.badge-soft-success {
+    background: var(--success-subtle);
+    color: var(--success);
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+}
+.badge-soft-danger {
+    background: var(--danger-subtle);
+    color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+}
+.badge-soft-warning {
+    background: var(--warning-subtle);
+    color: var(--warning);
+    border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+}
+.badge-soft-info {
+    background: var(--info-subtle);
+    color: var(--info);
+    border: 1px solid color-mix(in srgb, var(--info) 30%, transparent);
+}
+
+/* Quick access grid enhancements */
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+.quick-access-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration-none;
+    background: var(--surface-alt);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.quick-access-item:hover {
+    background: var(--card-bg);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+}
+.quick-access-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.quick-access-item:hover::before { opacity: 1; }
+.quick-access-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+.quick-access-item:hover .quick-access-icon { 
+    transform: scale(1.1); 
+}
+.quick-access-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-align: center;
+    width: 100%;
+}
+
+/* Responsive enhancements */
+@media (max-width: 1200px) {
+    .hero-greeting { 
+        padding: 2rem 2.5rem; 
+    }
+    .hero-greeting h4 { 
+        font-size: 1.6rem; 
+    }
+}
+
+@media (max-width: 991px) {
+    .hero-greeting { 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 1.5rem; 
+        padding: 1.75rem 2rem; 
+    }
+    .hero-greeting > div { 
+        width: 100%; 
+    }
+    .hero-date { 
+        justify-content: center; 
+    }
+    .d-flex.gap-2.justify-content-end { 
+        justify-content: center !important; 
+    }
+    .row.g-3 { 
+        --gx: 1.5rem; 
+        --gy: 1.5rem; 
+    }
+    .col-xl-3 { 
+        flex: 0 0 50%; 
+        max-width: 50%; 
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-greeting { 
+        padding: 1.5rem; 
+    }
+    .hero-greeting h4 { 
+        font-size: 1.4rem; 
+    }
+    .hero-greeting p { 
+        font-size: 0.95rem; 
+    }
+    .stat-box { 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 1rem; 
+        padding: 1.25rem; 
+    }
+    .sb-icon { 
+        margin-bottom: 0.5rem; 
+    }
+    .col-xl-3 { 
+        flex: 0 0 100%; 
+        max-width: 100%; 
+    }
+    .card-dash .card-body { 
+        padding: 1.25rem; 
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-greeting { 
+        padding: 1.25rem; 
+    }
+    .hero-greeting h4 { 
+        font-size: 1.25rem; 
+    }
+    .quick-access-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-greeting animate-fade-in">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+        <div>
+            <h4>Olá, {{ user.nome_completo|default:user.username }} <span style="font-size:1.4rem;">👋</span></h4>
+            <p>Bem-vindo ao seu painel de controle. Aqui você tem uma visão geral das principais métricas e atalhos para suas atividades diárias.</p>
+        </div>
+        <div>
+            <div class="hero-date mb-3"><i class="bi bi-calendar3"></i> {% now "l, d \d\e F \d\e Y" %}</div>
+            <div class="d-flex gap-3 justify-content-end">
+                <a href="{% url 'pdv:index' %}" class="btn btn-light btn-sm fw-bold text-primary px-4 py-2 shadow-sm">
+                    <i class="bi bi-cart3 me-2"></i> Abrir PDV
+                </a>
+                <a href="{% url 'delivery:novo' %}" class="btn btn-outline-light btn-sm px-4 py-2">
+                    <i class="bi bi-bicycle me-2"></i> Novo Delivery
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row g-4 mb-5">
+    <div class="col-xl-3 col-md-6 animate-fade-in-delay-1">
+        <div class="stat-box">
+            <div class="sb-icon" style="background:var(--primary-subtle);color:var(--primary);"><i class="bi bi-cart-check"></i></div>
+            <div class="min-width-0">
+                <div class="sb-value">R$ {{ vendas_hoje|floatformat:2|intcomma }}</div>
+                <div class="sb-label">Vendas Hoje</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 animate-fade-in-delay-1">
+        <div class="stat-box">
+            <div class="sb-icon" style="background:var(--warning-subtle);color:var(--warning);"><i class="bi bi-box-seam"></i></div>
+            <div class="min-width-0">
+                <div class="sb-value">{{ produtos_em_estoque }}</div>
+                <div class="sb-label">Produtos em Estoque</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 animate-fade-in-delay-2">
+        <div class="stat-box">
+            <div class="sb-icon" style="background:var(--success-subtle);color:var(--success);"><i class="bi bi-people"></i></div>
+            <div class="min-width-0">
+                <div class="sb-value">{{ clientes_ativos }}</div>
+                <div class="sb-label">Clientes Ativos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 animate-fade-in-delay-2">
+        <div class="stat-box">
+            <div class="sb-icon" style="background:var(--danger-subtle);color:var(--danger);"><i class="bi bi-shield-lock"></i></div>
+            <div class="min-width-0">
+                <div class="sb-value">{{ pendentes }}</div>
+                <div class="sb-label">Liberações Pendentes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Sections -->
+<div class="row g-4 mb-5">
+    <!-- Critical Stock -->
+    <div class="col-lg-4 animate-fade-in-delay-2">
+        <div class="card-dash h-100">
+            <div class="card-head">
+                <span><i class="bi bi-exclamation-triangle text-danger me-2"></i> Estoque Crítico</span>
+                <a href="{% url 'relatorios:index' %}" class="btn btn-ghost btn-sm" style="font-size:.75rem;">Ver todos <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+            <div class="card-body">
+                <div class="scroll-list">
+                    {% if produtos_estoque_baixo %}
+                    {% for p in produtos_estoque_baixo %}
+                    <div class="item-row">
+                        <div class="ir-icon" style="background:var(--danger-subtle);color:var(--danger);"><i class="bi bi-box-seam"></i></div>
+                        <div class="ir-info">
+                            <div class="ir-title">{{ p.nome|truncatechars:28 }}</div>
+                            <div class="ir-meta">Estoque: {{ p.estoque_atual|floatformat:0 }} · Mín: {{ p.estoque_minimo }}</div>
+                        </div>
+                        <span class="badge badge-soft-danger">{{ p.estoque_atual|floatformat:0 }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-sm">
+                        <i class="bi bi-check-circle text-success" style="opacity:.7;"></i>
+                        <p class="text-success mb-0">Excelente! Nenhum produto em situação crítica.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Sellers -->
+    <div class="col-lg-4 animate-fade-in-delay-3">
+        <div class="card-dash h-100">
+            <div class="card-head">
+                <span><i class="bi bi-trophy text-warning me-2"></i> Produtos Mais Vendidos</span>
+                <span style="font-size:.85rem;color:var(--text-muted);">Este mês</span>
+            </div>
+            <div class="card-body">
+                <div class="scroll-list">
+                    {% if top_produtos %}
+                    {% for p in top_produtos %}
+                    <div class="item-row">
+                        <div class="ir-icon" style="background:var(--warning-subtle);color:var(--warning);"><i class="bi bi-capsule"></i></div>
+                        <div class="ir-info">
+                            <div class="ir-title">{{ p.produto__nome|truncatechars:30 }}</div>
+                            <div class="ir-meta">{{ p.total_qtd }} unidades vendidas</div>
+                        </div>
+                        <span class="ir-value">R$ {{ p.total_valor|floatformat:2|intcomma }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-sm">
+                        <i class="bi bi-cart-x"></i>
+                        <p>Nenhuma venda registrada neste mês.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Ranking -->
+    <div class="col-lg-4 animate-fade-in-delay-3">
+        <div class="card-dash h-100">
+            <div class="card-head">
+                <span><i class="bi bi-person-badge text-primary me-2"></i> Ranking de Vendedores</span>
+                <span style="font-size:.85rem;color:var(--text-muted);">Este mês</span>
+            </div>
+            <div class="card-body">
+                <div class="scroll-list">
+                    {% if ranking_vendedores %}
+                    {% for v in ranking_vendedores %}
+                    <div class="item-row">
+                        <div class="ir-icon" style="background:var(--primary-subtle);color:var(--primary);">
+                            {% if forloop.first %}<i class="bi bi-award-fill"></i>{% else %}<i class="bi bi-person"></i>{% endif %}
+                        </div>
+                        <div class="ir-info">
+                            <div class="ir-title">{{ v.usuario__nome_completo|default:v.usuario__username }}</div>
+                            <div class="ir-meta">{{ v.total_vendas }} venda{{ v.total_vendas|pluralize }}</div>
+                        </div>
+                        <span class="ir-value text-primary">R$ {{ v.total_valor|floatformat:2|intcomma }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-sm">
+                        <i class="bi bi-people"></i>
+                        <p>Sem dados de vendas para exibir neste período.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Info Sections -->
+<div class="row g-4">
+    <!-- Active Promotions -->
+    <div class="col-lg-4">
+        <div class="card-dash h-100">
+            <div class="card-head">
+                <span><i class="bi bi-tags text-success me-2"></i> Promoções Ativas</span>
+                <a href="{% url 'vendas:promocoes' %}" class="btn btn-ghost btn-sm" style="font-size:.75rem;">Gerenciar <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+            <div class="card-body">
+                <div class="scroll-list">
+                    {% if promocoes_ativas %}
+                    {% for p in promocoes_ativas %}
+                    <div class="item-row">
+                        <div class="ir-icon" style="background:var(--success-subtle);color:var(--success);"><i class="bi bi-percent"></i></div>
+                        <div class="ir-info">
+                            <div class="ir-title">{{ p.nome }}</div>
+                            <div class="ir-meta">{{ p.data_inicio|date:'d/m/Y' }} — {{ p.data_fim|date:'d/m/Y' }}</div>
+                        </div>
+                        <span class="badge badge-soft-success">{{ p.get_tipo_display }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-sm">
+                        <i class="bi bi-tags"></i>
+                        <p>Nenhuma promoção ativa no momento.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Deliveries -->
+    <div class="col-lg-4">
+        <div class="card-dash h-100">
+            <div class="card-head">
+                <span><i class="bi bi-bicycle text-info me-2"></i> Últimas Entregas</span>
+                <a href="{% url 'delivery:lista' %}" class="btn btn-ghost btn-sm" style="font-size:.75rem;">Ver todas <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+            <div class="card-body">
+                <div class="scroll-list">
+                    {% if ultimas_entregas %}
+                    {% for e in ultimas_entregas %}
+                    <div class="item-row">
+                        <div class="ir-icon" style="background:var(--info-subtle);color:var(--info);"><i class="bi bi-bicycle"></i></div>
+                        <div class="ir-info">
+                            <div class="ir-title">{{ e.cliente.nome|default:"Cliente não informado" }}</div>
+                            <div class="ir-meta">{{ e.bairro }} · {{ e.criado_em|date:'d/m/Y H:i' }}</div>
+                        </div>
+                        <span class="badge {% if e.status == 'entregue' %}badge-soft-success{% elif e.status == 'cancelada' %}badge-soft-secondary{% elif e.status == 'em_rota' %}badge-soft-info{% else %}badge-soft-warning{% endif %}">{{ e.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-sm">
+                        <i class="bi bi-bicycle"></i>
+                        <p>Nenhuma entrega registrada.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access -->
+    <div class="col-lg-4">
+        <div class="card-dash h-100">
+            <div class="card-head">
+                <span><i class="bi bi-lightning-charge text-warning me-2"></i> Atalhos Rápidos</span>
+            </div>
+            <div class="card-body">
+                <div class="quick-access-grid">
+                    <a href="{% url 'pdv:index' %}" class="quick-access-item">
+                        <div class="quick-access-icon" style="background:var(--primary-subtle);color:var(--primary);">
+                            <i class="bi bi-cart3"></i>
+                        </div>
+                        <div class="quick-access-label">PDV Caixa</div>
+                    </a>
+                    <a href="{% url 'delivery:novo' %}" class="quick-access-item">
+                        <div class="quick-access-icon" style="background:var(--info-subtle);color:var(--info);">
+                            <i class="bi bi-bicycle"></i>
+                        </div>
+                        <div class="quick-access-label">Delivery</div>
+                    </a>
+                    <a href="{% url 'cadastros:produto_novo' %}" class="quick-access-item">
+                        <div class="quick-access-icon" style="background:var(--success-subtle);color:var(--success);">
+                            <i class="bi bi-plus-lg"></i>
+                        </div>
+                        <div class="quick-access-label">Novo Produto</div>
+                    </a>
+                    <a href="{% url 'vendas:davs' %}" class="quick-access-item">
+                        <div class="quick-access-icon" style="background:var(--warning-subtle);color:var(--warning);">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <div class="quick-access-label">Pré-Vendas</div>
+                    </a>
+                    <a href="{% url 'relatorios:index' %}" class="quick-access-item">
+                        <div class="quick-access-icon" style="background:var(--primary-subtle);color:var(--primary);">
+                            <i class="bi bi-file-bar-graph"></i>
+                        </div>
+                        <div class="quick-access-label">Relatórios</div>
+                    </a>
+                    <a href="{% url 'usuarios:liberacoes' %}" class="quick-access-item">
+                        <div class="quick-access-icon" style="background:var(--danger-subtle);color:var(--danger);">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <div class="quick-access-label">Liberações</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

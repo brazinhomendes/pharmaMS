@@ -1,0 +1,316 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}pharmaMS - Gestão Farmacêutica{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <script>
+        (function() {
+            const theme = localStorage.getItem('pharmams-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a class="brand" href="{% url 'core:dashboard' %}">
+                <div class="brand-icon"><i class="bi bi-capsule"></i></div>
+                <div class="min-width-0">
+                    <div class="brand-text">pharmaMS</div>
+                    {% if empresa_atual %}
+                    <div class="brand-sub" title="{{ empresa_atual.nome }}"><i class="bi bi-shop me-1"></i>{{ empresa_atual.nome }}</div>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section" onclick="toggleSection(this)">
+                <span>Principal</span>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="nav-collapse">
+                <a class="nav-link{% if request.resolver_match.view_name == 'core:dashboard' %} active{% endif %}" href="{% url 'core:dashboard' %}">
+                    <i class="bi bi-grid-1x2"></i> Dashboard
+                </a>
+                <a class="nav-link{% if request.resolver_match.view_name == 'pdv:index' %} active{% endif %}" href="{% url 'pdv:index' %}">
+                    <i class="bi bi-cart3"></i> PDV / Caixa
+                </a>
+            </div>
+
+            <div class="nav-section" onclick="toggleSection(this)">
+                <span>Cadastros</span>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="nav-collapse">
+                <a class="nav-link{% if request.resolver_match.view_name|slice:':9' == 'cadastros' and 'curva_abc' not in request.resolver_match.view_name and 'etiqueta' not in request.resolver_match.view_name and 'cliente' not in request.resolver_match.view_name and 'fornecedor' not in request.resolver_match.view_name %} active{% endif %}" href="{% url 'cadastros:produtos' %}">
+                    <i class="bi bi-box-seam"></i> Produtos
+                </a>
+                <a class="nav-link{% if 'cliente' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'cadastros:clientes' %}">
+                    <i class="bi bi-people"></i> Clientes
+                </a>
+                <a class="nav-link{% if 'fornecedor' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'cadastros:fornecedores' %}">
+                    <i class="bi bi-truck"></i> Fornecedores
+                </a>
+                <a class="nav-link{% if request.resolver_match.view_name == 'cadastros:curva_abc' %} active{% endif %}" href="{% url 'cadastros:curva_abc' %}">
+                    <i class="bi bi-bar-chart-steps"></i> Curva ABC
+                </a>
+                <a class="nav-link{% if 'etiqueta' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'cadastros:etiquetas_lista' %}">
+                    <i class="bi bi-tag"></i> Etiquetas
+                </a>
+            </div>
+
+            <div class="nav-section" onclick="toggleSection(this)">
+                <span>Operacional</span>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="nav-collapse">
+                <a class="nav-link{% if request.resolver_match.view_name|slice:':7' == 'estoque' %} active{% endif %}" href="{% url 'estoque:index' %}">
+                    <i class="bi bi-archive"></i> Estoque & Lotes
+                </a>
+                <a class="nav-link{% if 'compras' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'compras:lista' %}">
+                    <i class="bi bi-bag-plus"></i> Compras & Pedidos
+                </a>
+                <a class="nav-link{% if 'dav' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'vendas:davs' %}">
+                    <i class="bi bi-file-earmark-text"></i> Pré-Vendas (DAV)
+                </a>
+                <a class="nav-link{% if request.resolver_match.view_name == 'vendas:lista' or request.resolver_match.view_name == 'vendas:detalhe' %} active{% endif %}" href="{% url 'vendas:lista' %}">
+                    <i class="bi bi-receipt"></i> Vendas Realizadas
+                </a>
+                <a class="nav-link{% if 'promocao' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'vendas:promocoes' %}">
+                    <i class="bi bi-tags"></i> Promoções
+                </a>
+                <a class="nav-link{% if 'comissao' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'vendas:comissoes' %}">
+                    <i class="bi bi-percent"></i> Comissões
+                </a>
+            </div>
+
+            <div class="nav-section" onclick="toggleSection(this)">
+                <span>Gestão</span>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="nav-collapse">
+                <a class="nav-link{% if 'financeiro' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'financeiro:index' %}">
+                    <i class="bi bi-graph-up-arrow"></i> Financeiro
+                </a>
+                <a class="nav-link{% if 'fiscal' in request.resolver_match.view_name and 'nfce' not in request.resolver_match.view_name %} active{% endif %}" href="{% url 'fiscal:index' %}">
+                    <i class="bi bi-file-earmark-break"></i> Fiscal & NF-e
+                </a>
+                <a class="nav-link{% if 'nfce' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'fiscal:nfce_lista' %}">
+                    <i class="bi bi-receipt-cutoff"></i> NFC-e
+                </a>
+                <a class="nav-link{% if 'sngpc' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'sngpc:index' %}">
+                    <i class="bi bi-shield-check"></i> SNGPC Controlados
+                </a>
+                <a class="nav-link{% if 'pbm' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'pbm:index' %}">
+                    <i class="bi bi-building-check"></i> Convênios / PBM
+                </a>
+            </div>
+
+            <div class="nav-section" onclick="toggleSection(this)">
+                <span>Serviços</span>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="nav-collapse">
+                <a class="nav-link{% if 'crm' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'crm:index' %}">
+                    <i class="bi bi-heart-pulse"></i> CRM Clientes
+                </a>
+                <a class="nav-link{% if 'delivery' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'delivery:lista' %}">
+                    <i class="bi bi-bicycle"></i> Delivery & Entregas
+                </a>
+                <a class="nav-link{% if 'whatsapp' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'whatsapp:index' %}">
+                    <i class="bi bi-whatsapp"></i> WhatsApp
+                </a>
+                <a class="nav-link{% if 'relatorios' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'relatorios:index' %}">
+                    <i class="bi bi-file-bar-graph"></i> Relatórios
+                </a>
+            </div>
+
+            <div class="nav-section" onclick="toggleSection(this)">
+                <span>Sistema</span>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="nav-collapse">
+                <a class="nav-link{% if request.resolver_match.view_name == 'usuarios:lista' or request.resolver_match.view_name == 'usuarios:novo' or request.resolver_match.view_name == 'usuarios:editar' %} active{% endif %}" href="{% url 'usuarios:lista' %}">
+                    <i class="bi bi-person-gear"></i> Usuários
+                </a>
+                <a class="nav-link{% if 'liberacoes' in request.resolver_match.view_name or 'cancelamentos' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'usuarios:liberacoes' %}">
+                    <i class="bi bi-shield-lock"></i> Liberações
+                    {% if pending_liberacoes_count %}
+                    <span class="badge rounded-pill ms-auto" style="background:var(--danger);color:#fff;font-size:.65rem;padding:0.25rem 0.5rem;">{{ pending_liberacoes_count }}</span>
+                    {% endif %}
+                </a>
+                <a class="nav-link{% if 'empresas' in request.resolver_match.view_name %} active{% endif %}" href="{% url 'empresas:lista' %}">
+                    <i class="bi bi-building"></i> Empresas
+                </a>
+                {% if user.perfil == 'admin_master' %}
+                <a class="nav-link{% if 'system_admin' in request.resolver_match.namespace %} active{% endif %}" href="{% url 'system_admin:dashboard' %}">
+                    <i class="bi bi-shield-lock"></i> Admin Sistema
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="d-flex align-items-center gap-2 mb-2 px-1">
+                <div class="user-avatar">{{ user.nome_completo|default:user.username|first|upper }}</div>
+                <div class="min-width-0 flex-grow-1">
+                    <div class="user-name">{{ user.nome_completo|default:user.username }}</div>
+                    <div class="user-role">{{ user.get_perfil_display }}</div>
+                </div>
+            </div>
+            <a href="{% url 'usuarios:logout' %}" class="btn btn-sm w-100 btn-logout-sidebar">
+                <i class="bi bi-box-arrow-left me-1"></i> Sair do Sistema
+            </a>
+        </div>
+    </nav>
+    <div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+    <div class="main-content">
+        <nav class="navbar-top">
+            <button class="btn btn-ghost btn-icon" onclick="toggleSidebar()" title="Menu lateral">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <div class="d-flex align-items-center gap-2">
+                <span class="page-title">{% block page_title %}{% endblock %}</span>
+            </div>
+
+            <div class="topbar-badge ms-2 d-none d-md-inline-flex">
+                <i class="bi bi-calendar3"></i> <span>{% now "d/m/Y" %}</span>
+                <i class="bi bi-dot"></i>
+                <i class="bi bi-clock"></i> <span id="topbar-clock">{% now "H:i" %}</span>
+            </div>
+
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar modo Claro / Escuro">
+                    <i class="bi bi-moon-stars" id="theme-icon"></i>
+                </button>
+                <a href="{% url 'notifications:lista' %}" class="nav-icon-btn position-relative" title="Notificações">
+                    <i class="bi bi-bell"></i>
+                </a>
+                <a href="{% url 'configuracoes:index' %}" class="nav-icon-btn" title="Configurações">
+                    <i class="bi bi-gear"></i>
+                </a>
+                <div class="vr mx-1 d-none d-sm-block" style="height:24px;color:var(--border-color);"></div>
+                <div class="dropdown">
+                    <button class="btn btn-ghost p-1 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                        <div class="user-avatar" style="width:34px;height:34px;font-size:.78rem;">{{ user.nome_completo|default:user.username|first|upper }}</div>
+                        <span class="d-none d-md-inline fw-semibold text-color" style="font-size:0.84rem;">{{ user.nome_completo|default:user.username }}</span>
+                        <i class="bi bi-chevron-down d-none d-md-inline text-muted" style="font-size:0.7rem;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><h6 class="dropdown-header">{{ user.nome_completo|default:user.username }}</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'configuracoes:index' %}"><i class="bi bi-sliders2 me-2"></i> Configurações</a></li>
+                        <li><a class="dropdown-item" href="{% url 'usuarios:liberacoes' %}"><i class="bi bi-shield-lock me-2"></i> Liberações</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'usuarios:logout' %}"><i class="bi bi-box-arrow-left me-2"></i> Sair</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container-fluid p-3 p-md-4 animate-fade-in" style="flex:1;">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+                <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'danger' or message.tags == 'error' %}exclamation-octagon-fill{% elif message.tags == 'warning' %}exclamation-triangle-fill{% else %}info-circle-fill{% endif %} me-2"></i>
+                <div class="flex-grow-1">{{ message }}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+{% else %}
+<div class="login-page">
+    <div class="login-panel">
+        <div class="login-form-wrap">
+            {% block content_no_auth %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ─── Theme Toggling ───
+        function applyThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+            const theme = document.documentElement.getAttribute('data-theme');
+            icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+        }
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('pharmams-theme', next);
+            applyThemeIcon();
+        }
+        applyThemeIcon();
+
+        // ─── Sidebar Navigation ───
+        const isMobile = () => window.innerWidth <= 991;
+
+        function toggleSidebar() {
+            if (!isMobile()) {
+                document.getElementById('sidebar').classList.toggle('collapsed');
+                return;
+            }
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebar-overlay');
+            sb.classList.add('mobile-open');
+            ov.classList.add('active');
+        }
+        function closeMobileSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebar-overlay');
+            if (sb) sb.classList.remove('mobile-open');
+            if (ov) ov.classList.remove('active');
+        }
+
+        function toggleSection(el) {
+            el.nextElementSibling.classList.toggle('collapsed');
+            el.classList.toggle('collapsed');
+        }
+
+        (function initSections() {
+            document.querySelectorAll('.nav-collapse').forEach(c => {
+                const active = c.querySelector('.nav-link.active');
+                if (!active) { 
+                    c.classList.add('collapsed'); 
+                    if (c.previousElementSibling) c.previousElementSibling.classList.add('collapsed'); 
+                } else { 
+                    if (c.previousElementSibling) c.previousElementSibling.classList.remove('collapsed'); 
+                }
+            });
+        })();
+
+        // ─── Live Digital Clock ───
+        (function tick() {
+            const el = document.getElementById('topbar-clock');
+            if (el) el.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            setTimeout(tick, 30000);
+        })();
+
+        // ─── Auto-dismiss alerts after 6 seconds ───
+        setTimeout(() => {
+            document.querySelectorAll('.alert-dismissible').forEach(a => {
+                bootstrap.Alert.getOrCreateInstance(a).close();
+            });
+        }, 6000);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

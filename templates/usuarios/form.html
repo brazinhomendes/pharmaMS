@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}{{ form.instance.pk|yesno:"Editar Usuário,Novo Usuário" }} - pharmaMS{% endblock %}
+{% block page_title %}{{ form.instance.pk|yesno:"Editar Usuário,Novo Usuário" }}{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-person-plus" style="color:var(--primary);"></i>
+        <span>{{ form.instance.pk|yesno:"Editar Usuário,Novo Usuário" }}</span>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                {% for field in form %}
+                <div class="{% if field.name == 'username' or field.name == 'email' or field.name == 'nome_completo' %}col-md-6{% else %}col-md-4{% endif %}">
+                    <label class="form-label">{{ field.label }}</label>
+                    {% if field.name == 'password' %}
+                        <input type="password" name="{{ field.name }}" class="form-control" id="{{ field.id_for_label }}"{% if not form.instance.pk %} required{% endif %}>
+                    {% elif field.name == 'perfil' %}
+                        <select name="{{ field.name }}" class="form-select" id="{{ field.id_for_label }}">
+                            {% for value, label in field.field.choices %}
+                            <option value="{{ value }}"{% if field.value == value %} selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    {% elif field.name == 'is_active' %}
+                        <div class="form-check form-switch" style="padding-top:.35rem;">
+                            <input type="checkbox" name="{{ field.name }}" class="form-check-input" id="{{ field.id_for_label }}" role="switch"{% if field.value %} checked{% endif %}>
+                        </div>
+                    {% else %}
+                        <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.name }}" class="form-control" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}">
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="text-danger" style="font-size:.8rem;">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <hr class="my-3">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Salvar
+                </button>
+                <a href="{% url 'usuarios:lista' %}" class="btn btn-ghost">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

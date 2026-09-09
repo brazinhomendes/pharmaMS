@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Promoções - pharmaMS{% endblock %}
+{% block page_title %}Promoções{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5>Promoções</h5>
+        <div class="page-subtitle">{{ promocoes.count }} promoção{{ promocoes.count|pluralize }} cadastrada{{ promocoes.count|pluralize }}</div>
+    </div>
+    <a href="{% url 'vendas:promocao_nova' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nova Promoção
+    </a>
+</div>
+
+<div class="row g-3">
+    {% for promo in promocoes %}
+    <div class="col-md-6 col-lg-4 animate-fade-in">
+        <div class="card h-100" style="animation-delay:{{ forloop.counter0|divisibleby:3 }}s;">
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-semibold mb-0">{{ promo.nome }}</h6>
+                    {% if promo.ativo %}
+                    <span class="badge bg-success" style="font-size:.7rem;">Ativa</span>
+                    {% else %}
+                    <span class="badge bg-secondary" style="font-size:.7rem;">Inativa</span>
+                    {% endif %}
+                </div>
+                <div class="mb-2">
+                    <span class="badge badge-pharma" style="font-size:.7rem;">{{ promo.get_tipo_display }}</span>
+                </div>
+                <div style="font-size:.82rem;color:var(--text-secondary);flex:1;">
+                    <div class="d-flex justify-content-between py-1">
+                        <span>Início</span>
+                        <span class="fw-medium" style="color:var(--text-color);">{{ promo.data_inicio|date:'d/m/Y' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                        <span>Fim</span>
+                        <span class="fw-medium" style="color:var(--text-color);">{{ promo.data_fim|date:'d/m/Y' }}</span>
+                    </div>
+                    {% if promo.percentual_desconto %}
+                    <div class="d-flex justify-content-between py-1">
+                        <span>Desconto</span>
+                        <span class="fw-medium" style="color:var(--success);">{{ promo.percentual_desconto }}%</span>
+                    </div>
+                    {% endif %}
+                    {% if promo.preco_promocional %}
+                    <div class="d-flex justify-content-between py-1">
+                        <span>Preço Promocional</span>
+                        <span class="fw-medium" style="color:var(--primary);">R$ {{ promo.preco_promocional|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    {% if promo.tipo == 'quantidade' %}
+                    <div class="d-flex justify-content-between py-1">
+                        <span>Leve / Pague</span>
+                        <span class="fw-medium" style="color:var(--text-color);">{{ promo.quantidade_minima }} / {{ promo.quantidade_cobrar }}</span>
+                    </div>
+                    {% endif %}
+                    {% if promo.dias_semana %}
+                    <div class="d-flex justify-content-between py-1">
+                        <span>Dias</span>
+                        <span class="fw-medium" style="color:var(--text-color);">{{ promo.dias_semana }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <hr class="my-2">
+                <div class="d-flex gap-1">
+                    <a href="{% url 'vendas:promocao_editar' promo.pk %}" class="btn btn-ghost btn-icon" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'vendas:promocao_ativar' promo.pk %}" class="btn btn-ghost btn-icon" title="{% if promo.ativo %}Desativar{% else %}Ativar{% endif %}" style="color:{% if promo.ativo %}var(--warning){% else %}var(--success){% endif %};">
+                        {% if promo.ativo %}<i class="bi bi-pause-circle"></i>{% else %}<i class="bi bi-play-circle"></i>{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state" style="padding:4rem 2rem;">
+            <i class="bi bi-tags"></i>
+            <h6>Nenhuma promoção cadastrada</h6>
+            <p>Crie promoções para aplicar descontos automáticos nas vendas.</p>
+            <a href="{% url 'vendas:promocao_nova' %}" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-lg"></i> Criar Promoção
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Produtos Mais Vendidos - Relatórios{% endblock %}
+{% block page_title %}Produtos Mais Vendidos{% endblock %}
+{% block content %}
+<form method="get" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Data Início</label>
+                <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ data_inicio }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Data Fim</label>
+                <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ data_fim }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0">Top Produtos (Quantidade)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartProdutos" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h6 class="mb-0">Top Produtos (Faturamento)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartProdutosValor" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Ranking de Produtos</h6>
+        <span class="text-muted small">{{ produtos|length }} produto(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Produto</th>
+                        <th class="text-end">Qtd Vendida</th>
+                        <th class="text-end">Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.produto__nome }}</td>
+                        <td class="text-end">{{ p.quantidade }}</td>
+                        <td class="text-end">R$ {{ p.total|floatformat:2|intcomma }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">Nenhum produto encontrado</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams({ data_inicio: '{{ data_inicio }}', data_fim: '{{ data_fim }}' });
+    fetch('{% url "relatorios:produtos_json" %}?' + params)
+        .then(r => r.json())
+        .then(data => {
+            const nomes = data.map(d => d.nome.length > 20 ? d.nome.substring(0,18)+'..' : d.nome);
+            const quant = data.map(d => d.quantidade);
+            const valores = data.map(d => d.total);
+            new Chart(document.getElementById('chartProdutos'), {
+                type: 'bar',
+                data: {
+                    labels: nomes,
+                    datasets: [{
+                        label: 'Quantidade',
+                        data: quant,
+                        backgroundColor: 'rgba(13,110,253,0.2)',
+                        borderColor: 'rgba(13,110,253,1)',
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+            new Chart(document.getElementById('chartProdutosValor'), {
+                type: 'bar',
+                data: {
+                    labels: nomes,
+                    datasets: [{
+                        label: 'Faturamento (R$)',
+                        data: valores,
+                        backgroundColor: 'rgba(25,135,84,0.2)',
+                        borderColor: 'rgba(25,135,84,1)',
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

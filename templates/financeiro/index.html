@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+{% block title %}Financeiro - pharmaMS{% endblock %}
+{% block page_title %}Financeiro{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="stat-box" style="border-left:3px solid var(--danger);">
+      <div class="sb-icon" style="background:var(--danger-light);color:var(--danger);"><i class="bi bi-arrow-up-circle"></i></div>
+      <div>
+        <div class="sb-value" style="color:var(--danger);">R$ {{ total_pagar|floatformat:2|intcomma }}</div>
+        <div class="sb-label">Contas a Pagar</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-box" style="border-left:3px solid var(--success);">
+      <div class="sb-icon" style="background:var(--success-light);color:var(--success);"><i class="bi bi-arrow-down-circle"></i></div>
+      <div>
+        <div class="sb-value" style="color:var(--success);">R$ {{ total_receber|floatformat:2|intcomma }}</div>
+        <div class="sb-label">Contas a Receber</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-box" style="border-left:3px solid var(--primary);">
+      <div class="sb-icon" style="background:var(--primary-light);color:var(--primary);"><i class="bi bi-wallet2"></i></div>
+      <div>
+        <div class="sb-value" style="color:var(--primary);">R$ {{ saldo|floatformat:2|intcomma }}</div>
+        <div class="sb-label">Saldo Previsto</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card-dash h-100">
+      <div class="card-head">
+        <span><i class="bi bi-arrow-up-circle me-1" style="color:var(--danger);"></i> Contas a Pagar</span>
+        <a href="{% url 'financeiro:contas_pagar' %}" class="btn btn-ghost btn-sm">Ver</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card-dash h-100">
+      <div class="card-head">
+        <span><i class="bi bi-arrow-down-circle me-1" style="color:var(--success);"></i> Contas a Receber</span>
+        <a href="{% url 'financeiro:contas_receber' %}" class="btn btn-ghost btn-sm">Ver</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.stat-box {
+  padding:1.25rem; border-radius:var(--radius-md);
+  display:flex; align-items:center; gap:14px;
+  background:var(--card-bg); border:1px solid var(--border-color);
+  transition:all .2s ease;
+}
+.stat-box:hover { box-shadow:var(--shadow-md); }
+.stat-box .sb-icon {
+  width:46px; height:46px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; flex-shrink:0;
+}
+.stat-box .sb-value { font-size:1.5rem; font-weight:700; line-height:1; }
+.stat-box .sb-label { font-size:.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
+.card-dash { background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); transition:all .2s ease; }
+.card-dash:hover { box-shadow:var(--shadow-md); }
+.card-dash .card-head { padding:.85rem 1.1rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; font-weight:600; font-size:.85rem; }
+</style>
+{% endblock %}

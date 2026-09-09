@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+{% block title %}Entrega #{{ entrega.pk }} - pharmaMS{% endblock %}
+{% block page_title %}Entrega #{{ entrega.pk }}{% endblock %}
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><strong>Informações da Entrega</strong></span>
+                <span class="badge {% if entrega.status == 'entregue' %}bg-success{% elif entrega.status == 'cancelada' %}bg-secondary{% elif entrega.status == 'em_rota' %}bg-info{% elif entrega.status == 'atribuido' %}bg-primary{% else %}bg-warning text-dark{% endif %} fs-6">
+                    {{ entrega.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Cliente:</strong>
+                            {% if entrega.cliente %}
+                                {{ entrega.cliente.nome }}
+                            {% elif entrega.venda and entrega.venda.cliente %}
+                                {{ entrega.venda.cliente.nome }}
+                            {% else %}
+                                ---
+                            {% endif %}
+                        </p>
+                        <p><strong>Endereço:</strong> {{ entrega.endereco_entrega }}{% if entrega.complemento %}, {{ entrega.complemento }}{% endif %}</p>
+                        <p><strong>Bairro:</strong> {{ entrega.bairro }}</p>
+                        <p><strong>Cidade:</strong> {{ entrega.cidade }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Telefone de Contato:</strong> {{ entrega.contato_telefone|default:"---" }}</p>
+                        <p><strong>Entregador:</strong> {% if entrega.entregador %}{{ entrega.entregador.nome_completo|default:entrega.entregador.username }}{% else %}---{% endif %}</p>
+                        <p><strong>Taxa de Entrega:</strong> R$ {{ entrega.taxa_entrega|floatformat:2|intcomma }}</p>
+                        <p><strong>Data da Entrega:</strong> {{ entrega.data_entrega|date:'d/m/Y'|default:"---" }}</p>
+                        {% if entrega.venda %}
+                        <p><strong>Venda:</strong> <a href="{% url 'vendas:detalhe' entrega.venda.pk %}">#{{ entrega.venda.numero_venda }}</a></p>
+                        {% endif %}
+                        <p><strong>Criado em:</strong> {{ entrega.criado_em|date:'d/m/Y H:i' }}</p>
+                    </div>
+                </div>
+                {% if entrega.observacoes %}
+                <div class="mt-2">
+                    <strong>Observações:</strong>
+                    <p class="mb-0">{{ entrega.observacoes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><strong>Histórico de Status</strong></div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for item in timeline %}
+                    <div class="timeline-item {% if forloop.first %}active{% endif %}">
+                        <div class="timeline-marker {% if item.status == 'entregue' %}bg-success{% elif item.status == 'cancelada' %}bg-secondary{% elif item.status == 'em_rota' %}bg-info{% elif item.status == 'atribuido' %}bg-primary{% else %}bg-warning{% endif %}"></div>
+                        <div class="timeline-content">
+                            <strong>{{ item.label }}</strong>
+                            <br><small class="text-muted">{{ item.timestamp|date:'d/m/Y H:i' }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Nenhum histórico disponível.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><strong>Ações</strong></div>
+            <div class="card-body">
+                {% if entrega.entregador %}
+                <div class="d-flex align-items-center gap-2 mb-3 p-2" style="background:var(--primary-50);border-radius:var(--radius-sm);">
+                    <i class="bi bi-person-badge" style="color:var(--primary);"></i>
+                    <div>
+                        <div style="font-size:.75rem;color:var(--text-muted);">Entregador atual</div>
+                        <div style="font-weight:600;font-size:.9rem;">{{ entrega.entregador.nome_completo|default:entrega.entregador.username }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if next_statuses %}
+                <form method="post" action="{% url 'delivery:atualizar_status' entrega.pk %}">
+                    {% csrf_token %}
+                    {% for st, label in next_statuses %}
+                    {% if st == 'atribuido' %}
+                    <div class="mb-2">
+                        <label class="form-label">Entregador</label>
+                        <select name="entregador" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            {% for u in request.empresa.empresa_set.all %}
+                            {% if u.perfil == 'entregador' %}
+                            <option value="{{ u.id }}"{% if entrega.entregador_id == u.id %} selected{% endif %}>{{ u.nome_completo|default:u.username }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <button type="submit" name="status" value="{{ st }}" class="btn {% if st == 'cancelada' %}btn-outline-danger{% else %}btn-primary{% endif %} w-100 mb-2"
+                    {% if st == 'cancelada' %}onclick="return confirm('Cancelar esta entrega?')"{% endif %}>
+                    <i class="bi {% if st == 'atribuido' %}bi-person-check{% elif st == 'em_rota' %}bi-truck{% elif st == 'entregue' %}bi-check-circle{% elif st == 'cancelada' %}bi-x-circle{% endif %}"></i>
+                    {{ label }}
+                </button>
+                {% endfor %}
+            </form>
+            {% else %}
+            <p class="text-muted mb-0">Nenhuma ação disponível.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+
+<div>
+    <a href="{% url 'delivery:lista' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--border-color, #e5e7eb);
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    .timeline-marker {
+        position: absolute;
+        left: -2rem;
+        top: 4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 2px var(--border-color, #e5e7eb);
+    }
+    .timeline-item.active .timeline-marker {
+        box-shadow: 0 0 0 4px rgba(var(--bs-primary-rgb), 0.2);
+    }
+    .timeline-content {
+        padding-left: 0.5rem;
+    }
+</style>
+{% endblock %}

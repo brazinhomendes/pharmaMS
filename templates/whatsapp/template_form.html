@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Template WhatsApp - pharmaMS{% endblock %}
+{% block content %}
+<div class="page-header"><div><h5><i class="bi bi-whatsapp text-success me-2"></i>{{ template|yesno:"Editar,Criar" }} Template</h5></div></div>
+<div class="row"><div class="col-lg-8">
+    <div class="card"><div class="card-body">
+        <form method="post">{% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-8"><label class="form-label">Nome</label><input type="text" name="nome" class="form-control" value="{{ template.nome|default:'' }}" required></div>
+                <div class="col-md-4"><label class="form-label">Categoria</label>
+                    <select name="categoria" class="form-select">
+                        {% for val, label in template.categoria.choices %}<option value="{{ val }}" {% if template.categoria == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-12"><label class="form-label">Corpo da mensagem</label><textarea name="corpo" class="form-control" rows="8" placeholder="Ola {nome}! Sua pedido #{numero} foi...">{{ template.corpo|default:'' }}</textarea><small class="text-muted">Use {nome}, {numero}, {produto}, {valor}, {data} para campos dinamicos</small></div>
+            </div>
+            <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> Salvar</button><a href="{% url 'whatsapp:index' %}" class="btn btn-ghost">Cancelar</a></div>
+        </form>
+    </div></div>
+</div></div>
+{% endblock %}

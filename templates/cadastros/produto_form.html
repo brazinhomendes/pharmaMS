@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}{% if produto %}Editar{% else %}Novo{% endif %} Produto - pharmaMS{% endblock %}
+{% block page_title %}{% if produto %}Editar{% else %}Novo{% endif %} Produto{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-box-seam" style="color:var(--primary);"></i>
+                <span>Informações do Produto</span>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Código de Barras</label>
+                            <input type="text" name="codigo_barras" class="form-control" value="{{ produto.codigo_barras|default:'' }}" placeholder="EAN-13">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nome <span style="color:var(--danger);">*</span></label>
+                            <input type="text" name="nome" class="form-control" required value="{{ produto.nome|default:'' }}" placeholder="Nome do produto">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Unidade</label>
+                            <input type="text" name="unidade" class="form-control" value="{{ produto.unidade|default:'UN' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ativo</label>
+                            <select name="ativo" class="form-select">
+                                <option value="1" {% if produto.ativo or not produto %}selected{% endif %}>Sim</option>
+                                <option value="0" {% if produto.ativo == False %}selected{% endif %}>Não</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descrição</label>
+                            <textarea name="descricao" class="form-control" rows="2" placeholder="Descrição do produto">{{ produto.descricao|default:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="fw-semibold mb-3" style="font-size:.85rem;color:var(--text-secondary);">
+                        <i class="bi bi-tags me-1"></i> Classificação
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Classe Terapêutica</label>
+                            <select name="classe_terapeutica" class="form-select">
+                                <option value="">---</option>
+                                {% for c in classes %}
+                                <option value="{{ c.id }}" {% if produto.classe_terapeutica_id == c.id %}selected{% endif %}>{{ c.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Laboratório</label>
+                            <select name="laboratorio" class="form-select">
+                                <option value="">---</option>
+                                {% for l in laboratorios %}
+                                <option value="{{ l.id }}" {% if produto.laboratorio_id == l.id %}selected{% endif %}>{{ l.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Princípio Ativo</label>
+                            <input type="text" name="principio_ativo" class="form-control" value="{{ produto.principio_ativo|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Concentração</label>
+                            <input type="text" name="concentracao" class="form-control" value="{{ produto.concentracao|default:'' }}" placeholder="500mg">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de Medicamento</label>
+                            <select name="tipo_medicamento" class="form-select">
+                                <option value="comum" {% if produto.tipo_medicamento == 'comum' %}selected{% endif %}>Comum</option>
+                                <option value="controlado" {% if produto.tipo_medicamento == 'controlado' %}selected{% endif %}>Controlado</option>
+                                <option value="antibiotico" {% if produto.tipo_medicamento == 'antibiotico' %}selected{% endif %}>Antibiótico</option>
+                                <option value="generico" {% if produto.tipo_medicamento == 'generico' %}selected{% endif %}>Genérico</option>
+                                <option value="similar" {% if produto.tipo_medicamento == 'similar' %}selected{% endif %}>Similar</option>
+                                <option value="manipulado" {% if produto.tipo_medicamento == 'manipulado' %}selected{% endif %}>Manipulado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">NCM</label>
+                            <input type="text" name="ncm" class="form-control" value="{{ produto.ncm|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">CEST</label>
+                            <input type="text" name="cest" class="form-control" value="{{ produto.cest|default:'' }}">
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="fw-semibold mb-3" style="font-size:.85rem;color:var(--text-secondary);">
+                        <i class="bi bi-shield-check me-1"></i> Controle ANVISA
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Código ANVISA</label>
+                            <input type="text" name="codigo_anvisa" class="form-control" value="{{ produto.codigo_anvisa|default:'' }}">
+                        </div>
+                        <div class="col-md-8 d-flex align-items-end gap-3 pb-2">
+                            <div class="form-check">
+                                <input type="checkbox" name="precisa_receita" class="form-check-input" id="precisa_receita" {% if produto.precisa_receita %}checked{% endif %}>
+                                <label class="form-check-label" for="precisa_receita">Precisa de Receita</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="controlado_anvisa" class="form-check-input" id="controlado_anvisa" {% if produto.controlado_anvisa %}checked{% endif %}>
+                                <label class="form-check-label" for="controlado_anvisa">Controlado ANVISA</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h6 class="fw-semibold mb-3" style="font-size:.85rem;color:var(--text-secondary);">
+                        <i class="bi bi-currency-dollar me-1"></i> Preços e Estoque
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Preço de Custo</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" step="0.01" name="preco_custo" class="form-control" value="{{ produto.preco_custo|default:'0' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Preço de Venda</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" step="0.01" name="preco_venda" class="form-control" value="{{ produto.preco_venda|default:'0' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Margem de Lucro (%)</label>
+                            <input type="number" step="0.01" name="margem_lucro" class="form-control" value="{{ produto.margem_lucro|default:'0' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Estoque Mínimo</label>
+                            <input type="number" name="estoque_minimo" class="form-control" value="{{ produto.estoque_minimo|default:'0' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Estoque Máximo</label>
+                            <input type="number" name="estoque_maximo" class="form-control" value="{{ produto.estoque_maximo|default:'0' }}">
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg"></i> Salvar
+                        </button>
+                        <a href="{% url 'cadastros:produtos' %}" class="btn btn-ghost px-3">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

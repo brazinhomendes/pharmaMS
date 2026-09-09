@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block title %}Nova Empresa - pharmaMS{% endblock %}
+{% block page_title %}Cadastro da Empresa{% endblock %}
+
+{% block extra_css %}
+<style>
+.onboarding-hero {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+    border-radius: var(--radius-2xl);
+    padding: 2rem 2.5rem;
+    color: #fff;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+}
+.onboarding-hero h4 { font-weight: 800; letter-spacing: -0.6px; font-size: 1.6rem; margin: 0; }
+.onboarding-hero p { margin: 6px 0 0; font-size: 1rem; opacity: 0.9; }
+
+.card-form {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xs);
+    overflow: hidden;
+}
+.card-form .card-head {
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.card-form .card-body { padding: 1.75rem; }
+
+.form-label { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--text-color); }
+.form-control, .form-select { border-radius: var(--radius-lg); }
+.form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-subtle); }
+
+.section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="onboarding-hero animate-fade-in">
+    <h4><i class="bi bi-building me-2"></i>Cadastrar Empresa</h4>
+    <p>Preencha os dados da empresa para começar a usar o sistema.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card-form animate-fade-in-delay-1">
+            <div class="card-head">
+                <i class="bi bi-building text-primary"></i> Dados da Empresa
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="section-title mb-3">Dados Gerais</div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_nome">Nome da Empresa *</label>
+                            <input type="text" name="nome" id="id_nome" class="form-control" value="{{ form.nome.value|default:'' }}" required placeholder="Ex: Farmácia Central">
+                            {% if form.nome.errors %}<div class="text-danger small mt-1">{{ form.nome.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_cnpj">CNPJ *</label>
+                            <input type="text" name="cnpj" id="id_cnpj" class="form-control" value="{{ form.cnpj.value|default:'' }}" required placeholder="00.000.000/0000-00">
+                            {% if form.cnpj.errors %}<div class="text-danger small mt-1">{{ form.cnpj.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_ie">Inscrição Estadual</label>
+                            <input type="text" name="ie" id="id_ie" class="form-control" value="{{ form.ie.value|default:'' }}" placeholder="000.000.000.000">
+                            {% if form.ie.errors %}<div class="text-danger small mt-1">{{ form.ie.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="section-title mb-3">Endereço</div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label class="form-label" for="id_endereco">Endereço *</label>
+                            <input type="text" name="endereco" id="id_endereco" class="form-control" value="{{ form.endereco.value|default:'' }}" required placeholder="Rua, Avenida, etc.">
+                            {% if form.endereco.errors %}<div class="text-danger small mt-1">{{ form.endereco.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="id_bairro">Bairro *</label>
+                            <input type="text" name="bairro" id="id_bairro" class="form-control" value="{{ form.bairro.value|default:'' }}" required placeholder="Centro">
+                            {% if form.bairro.errors %}<div class="text-danger small mt-1">{{ form.bairro.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" for="id_cidade">Cidade *</label>
+                            <input type="text" name="cidade" id="id_cidade" class="form-control" value="{{ form.cidade.value|default:'' }}" required placeholder="São Paulo">
+                            {% if form.cidade.errors %}<div class="text-danger small mt-1">{{ form.cidade.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="id_uf">UF *</label>
+                            <select name="uf" id="id_uf" class="form-select" required>
+                                <option value="">Selecione</option>
+                                <option value="AC" {% if form.uf.value == 'AC' %}selected{% endif %}>AC</option>
+                                <option value="AL" {% if form.uf.value == 'AL' %}selected{% endif %}>AL</option>
+                                <option value="AP" {% if form.uf.value == 'AP' %}selected{% endif %}>AP</option>
+                                <option value="AM" {% if form.uf.value == 'AM' %}selected{% endif %}>AM</option>
+                                <option value="BA" {% if form.uf.value == 'BA' %}selected{% endif %}>BA</option>
+                                <option value="CE" {% if form.uf.value == 'CE' %}selected{% endif %}>CE</option>
+                                <option value="DF" {% if form.uf.value == 'DF' %}selected{% endif %}>DF</option>
+                                <option value="ES" {% if form.uf.value == 'ES' %}selected{% endif %}>ES</option>
+                                <option value="GO" {% if form.uf.value == 'GO' %}selected{% endif %}>GO</option>
+                                <option value="MA" {% if form.uf.value == 'MA' %}selected{% endif %}>MA</option>
+                                <option value="MT" {% if form.uf.value == 'MT' %}selected{% endif %}>MT</option>
+                                <option value="MS" {% if form.uf.value == 'MS' %}selected{% endif %}>MS</option>
+                                <option value="MG" {% if form.uf.value == 'MG' %}selected{% endif %}>MG</option>
+                                <option value="PA" {% if form.uf.value == 'PA' %}selected{% endif %}>PA</option>
+                                <option value="PB" {% if form.uf.value == 'PB' %}selected{% endif %}>PB</option>
+                                <option value="PR" {% if form.uf.value == 'PR' %}selected{% endif %}>PR</option>
+                                <option value="PE" {% if form.uf.value == 'PE' %}selected{% endif %}>PE</option>
+                                <option value="PI" {% if form.uf.value == 'PI' %}selected{% endif %}>PI</option>
+                                <option value="RJ" {% if form.uf.value == 'RJ' %}selected{% endif %}>RJ</option>
+                                <option value="RN" {% if form.uf.value == 'RN' %}selected{% endif %}>RN</option>
+                                <option value="RS" {% if form.uf.value == 'RS' %}selected{% endif %}>RS</option>
+                                <option value="RO" {% if form.uf.value == 'RO' %}selected{% endif %}>RO</option>
+                                <option value="RR" {% if form.uf.value == 'RR' %}selected{% endif %}>RR</option>
+                                <option value="SC" {% if form.uf.value == 'SC' %}selected{% endif %}>SC</option>
+                                <option value="SP" {% if form.uf.value == 'SP' %}selected{% endif %}>SP</option>
+                                <option value="SE" {% if form.uf.value == 'SE' %}selected{% endif %}>SE</option>
+                                <option value="TO" {% if form.uf.value == 'TO' %}selected{% endif %}>TO</option>
+                            </select>
+                            {% if form.uf.errors %}<div class="text-danger small mt-1">{{ form.uf.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="id_cep">CEP *</label>
+                            <input type="text" name="cep" id="id_cep" class="form-control" value="{{ form.cep.value|default:'' }}" required placeholder="00000-000">
+                            {% if form.cep.errors %}<div class="text-danger small mt-1">{{ form.cep.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="section-title mb-3">Contato</div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_telefone">Telefone</label>
+                            <input type="text" name="telefone" id="id_telefone" class="form-control" value="{{ form.telefone.value|default:'' }}" placeholder="(00) 00000-0000">
+                            {% if form.telefone.errors %}<div class="text-danger small mt-1">{{ form.telefone.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="id_email">E-mail</label>
+                            <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value|default:'' }}" placeholder="contato@empresa.com.br">
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <a href="{% url 'core:onboarding' %}" class="btn btn-ghost">
+                            <i class="bi bi-arrow-left me-1"></i> Voltar
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4">
+                            <i class="bi bi-check-lg me-1"></i> Salvar Empresa
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

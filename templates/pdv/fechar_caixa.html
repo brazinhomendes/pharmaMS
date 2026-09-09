@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Fechamento de Caixa - pharmaMS{% endblock %}
+{% block page_title %}Fechamento de Caixa #{{ caixa.id }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3 animate-fade-in">
+            <div class="card-header">
+                <i class="bi bi-cash-stack me-1" style="color:var(--primary);"></i> Resumo do Caixa
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-3">
+                        <div style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;">Saldo Inicial</div>
+                        <div style="font-size:1.1rem;font-weight:700;">R$ {{ caixa.saldo_inicial|floatformat:2 }}</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;">Abertura</div>
+                        <div style="font-size:.9rem;font-weight:500;">{{ caixa.data_abertura|date:'d/m/Y H:i' }}</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;">Usuário</div>
+                        <div style="font-size:.9rem;font-weight:500;">{{ caixa.usuario_abertura.get_full_name|default:caixa.usuario_abertura.username }}</div>
+                    </div>
+                    <div class="col-3">
+                        <div style="font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;">Movimentos</div>
+                        <div style="font-size:.9rem;font-weight:500;">{{ caixa.movimentos.count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="card mb-3 animate-fade-in-delay-1">
+                <div class="card-header">
+                    <i class="bi bi-table me-1" style="color:var(--primary);"></i> Conferência por Forma de Pagamento
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Forma de Pagamento</th>
+                                <th class="text-end">Esperado (R$)</th>
+                                <th class="text-end">Contado (R$)</th>
+                                <th class="text-end">Diferença (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-medium"><i class="bi bi-cash me-1" style="color:var(--success);"></i> Dinheiro</td>
+                                <td class="text-end" id="expected-especie">{{ expected_especie|floatformat:2 }}</td>
+                                <td class="text-end">
+                                    <input type="number" name="saldo_em_especie" id="input-especie" class="form-control form-control-sm text-end d-inline-block" step="0.01" value="{{ expected_especie|floatformat:2 }}" style="width:140px;">
+                                </td>
+                                <td class="text-end fw-medium" id="diff-especie">0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-medium"><i class="bi bi-credit-card me-1" style="color:var(--primary);"></i> Cartão (Crédito/Débito)</td>
+                                <td class="text-end" id="expected-cartao">{{ expected_cartao|floatformat:2 }}</td>
+                                <td class="text-end">
+                                    <input type="number" name="saldo_em_cartao" id="input-cartao" class="form-control form-control-sm text-end d-inline-block" step="0.01" value="{{ expected_cartao|floatformat:2 }}" style="width:140px;">
+                                </td>
+                                <td class="text-end fw-medium" id="diff-cartao">0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-medium"><i class="bi bi-qr-code me-1" style="color:var(--info);"></i> Pix</td>
+                                <td class="text-end" id="expected-pix">{{ expected_pix|floatformat:2 }}</td>
+                                <td class="text-end">
+                                    <input type="number" name="saldo_em_pix" id="input-pix" class="form-control form-control-sm text-end d-inline-block" step="0.01" value="{{ expected_pix|floatformat:2 }}" style="width:140px;">
+                                </td>
+                                <td class="text-end fw-medium" id="diff-pix">0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-medium"><i class="bi bi-building me-1" style="color:var(--warning);"></i> Convênio / Outros</td>
+                                <td class="text-end" id="expected-convenio">{{ expected_convenio|floatformat:2 }}</td>
+                                <td class="text-end">
+                                    <input type="number" name="saldo_em_convenio" id="input-convenio" class="form-control form-control-sm text-end d-inline-block" step="0.01" value="{{ expected_convenio|floatformat:2 }}" style="width:140px;">
+                                </td>
+                                <td class="text-end fw-medium" id="diff-convenio">0.00</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background:var(--primary-50);">
+                                <th class="fw-bold">Totais</th>
+                                <th class="text-end" id="total-expected">{{ expected_especie|add:expected_cartao|add:expected_pix|add:expected_convenio|floatformat:2 }}</th>
+                                <th class="text-end" id="total-counted">{{ expected_especie|add:expected_cartao|add:expected_pix|add:expected_convenio|floatformat:2 }}</th>
+                                <th class="text-end" id="total-diff">0.00</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mb-3 animate-fade-in-delay-2">
+                <div class="card-header">
+                    <i class="bi bi-list-ul me-1" style="color:var(--text-secondary);"></i> Outros Movimentos
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="kpi-card">
+                                <div class="kpi-value" style="color:var(--danger);">R$ {{ total_saidas|floatformat:2 }}</div>
+                                <div class="kpi-label">Total de Saídas</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kpi-card">
+                                <div class="kpi-value" style="color:var(--warning);">R$ {{ total_sangrias|floatformat:2 }}</div>
+                                <div class="kpi-label">Total de Sangrias</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kpi-card">
+                                <div class="kpi-value" style="color:var(--success);">R$ {{ total_suprimentos|floatformat:2 }}</div>
+                                <div class="kpi-label">Total de Suprimentos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3 animate-fade-in-delay-3">
+                <div class="card-header">
+                    <i class="bi bi-calculator me-1" style="color:var(--primary);"></i> Resumo Final
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Saldo Inicial</div>
+                                <div class="kpi-value">R$ {{ caixa.saldo_inicial|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Saldo Esperado</div>
+                                <div class="kpi-value" id="final-esperado">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Diferença Total</div>
+                                <div class="kpi-value" id="final-diferenca" style="color:var(--success);">R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3 animate-fade-in-delay-3">
+                <div class="card-header">
+                    <i class="bi bi-chat-text me-1" style="color:var(--text-secondary);"></i> Observações
+                </div>
+                <div class="card-body">
+                    <textarea name="observacoes_fechamento" class="form-control" rows="3" placeholder="Observações sobre o fechamento..."></textarea>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 animate-fade-in-delay-3">
+                <button type="submit" class="btn btn-primary btn-lg px-4" onclick="return confirm('Confirma o fechamento do caixa?')">
+                    <i class="bi bi-check-lg"></i> Confirmar Fechamento
+                </button>
+                <a href="{% url 'pdv:index' %}" class="btn btn-ghost btn-lg">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    const expected = {
+        especie: parseFloat('{{ expected_especie|stringformat:"f" }}') || 0,
+        cartao: parseFloat('{{ expected_cartao|stringformat:"f" }}') || 0,
+        pix: parseFloat('{{ expected_pix|stringformat:"f" }}') || 0,
+        convenio: parseFloat('{{ expected_convenio|stringformat:"f" }}') || 0,
+    };
+
+    function updateDiffs() {
+        let totalExpected = 0;
+        let totalCounted = 0;
+
+        ['especie', 'cartao', 'pix', 'convenio'].forEach(function(key) {
+            const input = document.getElementById('input-' + key);
+            const counted = parseFloat(input.value) || 0;
+            const exp = expected[key];
+            const diff = counted - exp;
+            const diffEl = document.getElementById('diff-' + key);
+            diffEl.textContent = diff.toFixed(2);
+            diffEl.style.color = diff < -0.01 ? 'var(--danger)' : (diff > 0.01 ? 'var(--success)' : '');
+
+            totalExpected += exp;
+            totalCounted += counted;
+        });
+
+        document.getElementById('total-expected').textContent = totalExpected.toFixed(2);
+        document.getElementById('total-counted').textContent = totalCounted.toFixed(2);
+        const totalDiff = totalCounted - totalExpected;
+        const tdEl = document.getElementById('total-diff');
+        tdEl.textContent = totalDiff.toFixed(2);
+        tdEl.style.color = totalDiff < -0.01 ? 'var(--danger)' : (totalDiff > 0.01 ? 'var(--success)' : '');
+
+        const saldoInicial = parseFloat('{{ caixa.saldo_inicial|stringformat:"f" }}') || 0;
+        const saldoEsperado = saldoInicial + totalExpected;
+        document.getElementById('final-esperado').textContent = 'R$ ' + saldoEsperado.toFixed(2);
+        const fdEl = document.getElementById('final-diferenca');
+        fdEl.textContent = 'R$ ' + totalDiff.toFixed(2);
+        fdEl.style.color = totalDiff < -0.01 ? 'var(--danger)' : (totalDiff > 0.01 ? 'var(--success)' : 'var(--success)');
+    }
+
+    document.querySelectorAll('[id^="input-"]').forEach(function(input) {
+        input.addEventListener('input', updateDiffs);
+    });
+
+    updateDiffs();
+</script>
+{% endblock %}

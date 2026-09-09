@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Relatórios - pharmaMS{% endblock %}
+{% block page_title %}Relatórios{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-3 me-3" style="background:var(--success-light);">
+                        <i class="bi bi-cart-check text-success fs-4"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Vendas Hoje</small>
+                        <h4 class="mb-0 text-success">R$ {{ vendas_hoje|floatformat:2|intcomma }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-3 me-3" style="background:var(--danger-light);">
+                        <i class="bi bi-arrow-up-circle text-danger fs-4"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Contas a Pagar</small>
+                        <h4 class="mb-0 text-danger">R$ {{ contas_pagar|floatformat:2|intcomma }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-3 me-3" style="background:var(--info-light);">
+                        <i class="bi bi-arrow-down-circle text-primary fs-4"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Contas a Receber</small>
+                        <h4 class="mb-0 text-primary">R$ {{ contas_receber|floatformat:2|intcomma }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-3 me-3" style="background:var(--warning-light);">
+                        <i class="bi bi-exclamation-triangle text-warning fs-4"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Estoque Baixo</small>
+                        <h4 class="mb-0 text-warning">{{ produtos_estoque_baixo }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <a href="{% url 'relatorios:vendas' %}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-cart-check text-primary" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">Vendas por Período</h5>
+                    <p class="text-muted small">Relatório de vendas em um intervalo de datas</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'relatorios:produtos' %}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-box-seam text-success" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">Produtos Mais Vendidos</h5>
+                    <p class="text-muted small">Ranking de produtos mais vendidos</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'relatorios:clientes' %}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-people text-info" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">Clientes Fiéis</h5>
+                    <p class="text-muted small">Clientes ranqueados por frequência de compras</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'relatorios:estoque' %}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-archive text-warning" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">Estoque</h5>
+                    <p class="text-muted small">Produtos com estoque baixo e próximo ao vencimento</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'relatorios:financeiro' %}" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-credit-card text-danger" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">Financeiro</h5>
+                    <p class="text-muted small">Resumo de contas a pagar e receber</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

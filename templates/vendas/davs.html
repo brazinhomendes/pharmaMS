@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Pré-Vendas / DAV - pharmaMS{% endblock %}
+{% block page_title %}Pré-Vendas (DAV){% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="{% url 'vendas:davs' %}" class="btn btn-outline-secondary btn-sm">Todas</a>
+        <a href="{% url 'vendas:davs' %}?status=aberto" class="btn btn-outline-primary btn-sm">Abertos</a>
+        <a href="{% url 'vendas:davs' %}?status=finalizado" class="btn btn-outline-success btn-sm">Finalizados</a>
+        <a href="{% url 'vendas:davs' %}?status=cancelado" class="btn btn-outline-secondary btn-sm">Cancelados</a>
+    </div>
+    <a href="{% url 'vendas:dav_novo' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Novo DAV</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="busca" class="form-control form-control-sm" placeholder="Buscar por nº ou cliente..." value="{{ request.GET.busca }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="data_inicio" class="form-control form-control-sm" value="{{ request.GET.data_inicio }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="data_fim" class="form-control form-control-sm" value="{{ request.GET.data_fim }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-sm btn-pharma w-100"><i class="bi bi-search"></i> Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>DAV</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Criado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dav in davs %}
+                    <tr>
+                        <td>{{ dav.numero }}</td>
+                        <td>{{ dav.cliente|default:'---' }}</td>
+                        <td>R$ {{ dav.total_geral|floatformat:2 }}</td>
+                        <td>
+                            <span class="badge {% if dav.status == 'aberto' %}bg-primary{% elif dav.status == 'finalizado' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ dav.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ dav.data_criacao|date:'d/m/Y H:i' }}</td>
+                        <td>
+                            <a href="{% url 'vendas:dav_detalhe' dav.pk %}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                            {% if dav.status == 'aberto' %}
+                            <a href="{% url 'vendas:dav_editar' dav.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'vendas:dav_finalizar' dav.pk %}" class="btn btn-sm btn-outline-success" onclick="return confirm('Finalizar este DAV e gerar venda?')"><i class="bi bi-check-lg"></i></a>
+                            <a href="{% url 'vendas:dav_cancelar' dav.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancelar este DAV?')"><i class="bi bi-x-lg"></i></a>
+                            {% endif %}
+                            <a href="{% url 'vendas:dav_imprimir' dav.pk %}" class="btn btn-sm btn-outline-secondary" target="_blank"><i class="bi bi-printer"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">Nenhum DAV encontrado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

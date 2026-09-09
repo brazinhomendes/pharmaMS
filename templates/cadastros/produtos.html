@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Produtos - pharmaMS{% endblock %}
+{% block page_title %}Produtos{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5>Lista de Produtos</h5>
+        <div class="page-subtitle">{{ produtos.count }} produto{{ produtos.count|pluralize }} cadastrado{{ produtos.count|pluralize }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'cadastros:curva_abc' %}" class="btn btn-ghost">
+            <i class="bi bi-bar-chart-steps"></i> Curva ABC
+        </a>
+        <a href="{% url 'cadastros:etiquetas_imprimir' %}" class="btn btn-ghost">
+            <i class="bi bi-tags"></i> Etiquetas
+        </a>
+        <a href="{% url 'cadastros:produto_novo' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Novo Produto
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">ABC</th>
+                    <th>Cód. Barras</th>
+                    <th>Produto</th>
+                    <th>Lab.</th>
+                    <th>Preço Venda</th>
+                    <th>Est. Mín.</th>
+                    <th>Controle</th>
+                    <th style="width:80px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in produtos %}
+                <tr>
+                    <td>
+                        {% if p.curva_abc == 'A' %}
+                        <span class="badge bg-success">A</span>
+                        {% elif p.curva_abc == 'B' %}
+                        <span class="badge bg-warning text-dark">B</span>
+                        {% else %}
+                        <span class="badge bg-secondary">C</span>
+                        {% endif %}
+                    </td>
+                    <td><code style="font-size:.75rem;background:var(--body-bg);padding:2px 6px;border-radius:4px;">{{ p.codigo_barras|default:'-' }}</code></td>
+                    <td>
+                        <a href="{% url 'cadastros:produto_detalhe' p.id %}" class="text-decoration-none fw-medium" style="color:var(--text-color);">
+                            {{ p.nome }}
+                        </a>
+                        {% if p.controlado_anvisa %}
+                        <span class="badge bg-danger ms-1" style="font-size:.65rem;">ANVISA</span>
+                        {% endif %}
+                    </td>
+                    <td><span style="font-size:.8rem;color:var(--text-secondary);">{{ p.laboratorio|default:'-' }}</span></td>
+                    <td><strong>R$ {{ p.preco_venda|floatformat:2 }}</strong></td>
+                    <td>{{ p.estoque_minimo }}</td>
+                    <td>
+                        {% if p.ativo %}
+                        <span class="status-dot active"></span>
+                        {% else %}
+                        <span class="status-dot inactive"></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'cadastros:produto_editar' p.id %}" class="btn btn-ghost btn-icon" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'cadastros:etiquetas_imprimir' %}" class="btn btn-ghost btn-icon" title="Etiqueta">
+                                <i class="bi bi-tag"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="bi bi-box-seam"></i>
+                            <h6>Nenhum produto cadastrado</h6>
+                            <p>Comece cadastrando seu primeiro produto no sistema.</p>
+                            <a href="{% url 'cadastros:produto_novo' %}" class="btn btn-primary mt-2">
+                                <i class="bi bi-plus-lg"></i> Novo Produto
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

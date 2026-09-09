@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}{{ produto.nome }} - pharmaMS{% endblock %}
+{% block page_title %}{{ produto.nome }}{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-sm">
+                    <tr><th>Código de Barras</th><td>{{ produto.codigo_barras|default:'-' }}</td></tr>
+                    <tr><th>Nome</th><td>{{ produto.nome }}</td></tr>
+                    <tr><th>Descrição</th><td>{{ produto.descricao|default:'-'|linebreaks }}</td></tr>
+                    <tr><th>Classe Terapêutica</th><td>{{ produto.classe_terapeutica|default:'-' }}</td></tr>
+                    <tr><th>Laboratório</th><td>{{ produto.laboratorio|default:'-' }}</td></tr>
+                    <tr><th>Princípio Ativo</th><td>{{ produto.principio_ativo|default:'-' }}</td></tr>
+                    <tr><th>Concentração</th><td>{{ produto.concentracao|default:'-' }}</td></tr>
+                    <tr><th>Tipo de Medicamento</th><td>{{ produto.get_tipo_medicamento_display }}</td></tr>
+                    <tr><th>Unidade</th><td>{{ produto.unidade }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-sm">
+                    <tr><th>Preço de Custo</th><td>R$ {{ produto.preco_custo|floatformat:2 }}</td></tr>
+                    <tr><th>Preço de Venda</th><td>R$ {{ produto.preco_venda|floatformat:2 }}</td></tr>
+                    <tr><th>Margem de Lucro</th><td>{{ produto.margem_lucro|floatformat:2 }}%</td></tr>
+                    <tr><th>NCM</th><td>{{ produto.ncm|default:'-' }}</td></tr>
+                    <tr><th>CEST</th><td>{{ produto.cest|default:'-' }}</td></tr>
+                    <tr><th>Código ANVISA</th><td>{{ produto.codigo_anvisa|default:'-' }}</td></tr>
+                    <tr><th>Estoque Mínimo</th><td>{{ produto.estoque_minimo }}</td></tr>
+                    <tr><th>Estoque Máximo</th><td>{{ produto.estoque_maximo }}</td></tr>
+                    <tr><th>Precisa Receita</th><td>{% if produto.precisa_receita %}<span class="badge bg-warning">Sim</span>{% else %}<span class="badge bg-secondary">Não</span>{% endif %}</td></tr>
+                    <tr><th>Controlado ANVISA</th><td>{% if produto.controlado_anvisa %}<span class="badge bg-danger">Sim</span>{% else %}<span class="badge bg-secondary">Não</span>{% endif %}</td></tr>
+                    <tr><th>Ativo</th><td>{% if produto.ativo %}<span class="badge bg-success">Sim</span>{% else %}<span class="badge bg-danger">Não</span>{% endif %}</td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="mt-3">
+            <a href="{% url 'cadastros:produto_editar' produto.id %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a href="{% url 'cadastros:produtos' %}" class="btn btn-outline-secondary">Voltar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

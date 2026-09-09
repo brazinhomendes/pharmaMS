@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etiquetas - {{ impressao.data_impressao|date:'d/m/Y' }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+128&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @page {
+            size: auto;
+            margin: {{ modelo.margem_superior }}mm {{ modelo.margem_direita }}mm {{ modelo.margem_inferior }}mm {{ modelo.margem_esquerda }}mm;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: {{ modelo.fonte_tamanho }}px;
+            line-height: 1.2;
+        }
+
+        .page {
+            width: 100%;
+        }
+
+        .label-grid {
+            display: grid;
+            grid-template-columns: repeat({{ modelo.colunas }}, 1fr);
+            gap: 0;
+            page-break-after: always;
+        }
+
+        .label {
+            width: {{ modelo.largura_mm }}mm;
+            height: {{ modelo.altura_mm }}mm;
+            border: 0.5px dashed #ccc;
+            padding: 2mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+
+        .label .cabecalho {
+            font-size: {{ modelo.fonte_tamanho|add:2 }}px;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+
+        .label .nome {
+            font-size: {{ modelo.fonte_tamanho|add:2 }}px;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+
+        .label .preco {
+            font-size: {{ modelo.fonte_tamanho|add:6 }}px;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+
+        .label .barcode {
+            font-family: 'Libre Barcode 128', cursive;
+            font-size: {{ modelo.fonte_tamanho|add:14 }}px;
+            margin-bottom: 1px;
+            line-height: 1;
+        }
+
+        .label .barcode-number {
+            font-size: 7px;
+            margin-top: -3px;
+            margin-bottom: 1px;
+        }
+
+        .label .info {
+            font-size: {{ modelo.fonte_tamanho|add:-1 }}px;
+            margin-bottom: 1px;
+        }
+
+        .label .rodape {
+            font-size: {{ modelo.fonte_tamanho }}px;
+            margin-top: 1px;
+        }
+
+        @media print {
+            body { margin: 0; padding: 0; }
+            .no-print { display: none; }
+            .label { border: none; }
+        }
+
+        .no-print {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .no-print .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .no-print .btn:hover { background: #0b5ed7; }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button class="btn" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir / Salvar PDF</button>
+        <a href="{% url 'cadastros:etiquetas_lista' %}" style="display:inline-block;padding:10px 20px;background:#6c757d;color:#fff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-size:14px;margin-left:10px;">Voltar</a>
+    </div>
+
+    <div class="page">
+        {% for item in labels %}
+        {% if forloop.counter0|divisibleby:modelo.colunas and forloop.counter0 > 0 %}
+    </div>
+    <div class="page">
+        <div class="label-grid">
+        {% elif forloop.first %}
+        <div class="label-grid">
+        {% endif %}
+            <div class="label">
+                {% if modelo.cabecalho %}
+                <div class="cabecalho">{{ modelo.cabecalho }}</div>
+                {% endif %}
+
+                {% if modelo.mostrar_nome %}
+                <div class="nome">{{ item.produto.nome }}</div>
+                {% endif %}
+
+                {% if modelo.mostrar_codigo_barras and item.produto.codigo_barras %}
+                <div class="barcode">{{ item.produto.codigo_barras }}</div>
+                <div class="barcode-number">{{ item.produto.codigo_barras }}</div>
+                {% endif %}
+
+                {% if modelo.mostrar_preco %}
+                <div class="preco">R$ {{ item.produto.preco_venda|floatformat:2 }}</div>
+                {% endif %}
+
+                {% if modelo.mostrar_preco_custo %}
+                <div class="info">Custo: R$ {{ item.produto.preco_custo|floatformat:2 }}</div>
+                {% endif %}
+
+                {% if modelo.mostrar_laboratorio and item.produto.laboratorio %}
+                <div class="info">{{ item.produto.laboratorio.nome }}</div>
+                {% endif %}
+
+                {% if modelo.mostrar_validade %}
+                    {% if item.lote and item.lote.data_validade %}
+                    <div class="info">Val: {{ item.lote.data_validade|date:'d/m/Y' }}</div>
+                    {% else %}
+                    <div class="info">Val: ---</div>
+                    {% endif %}
+                {% endif %}
+
+                {% if modelo.rodape %}
+                <div class="rodape">{{ modelo.rodape }}</div>
+                {% endif %}
+            </div>
+        {% if forloop.last %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</body>
+</html>

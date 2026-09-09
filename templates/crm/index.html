@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}CRM - pharmaMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div><h5><i class="bi bi-people text-info me-2"></i>CRM - Gestao de Relacionamento</h5><p class="page-subtitle mb-0">Campanhas, perfil de clientes e aniversariantes</p></div>
+    <a href="{% url 'crm:campanha_nova' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Nova Campanha</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:var(--info-subtle);color:var(--info);"><i class="bi bi-people"></i></div><div><div class="fw-bold">{{ stats.total_clientes }}</div><div class="text-muted" style="font-size:.78rem;">Clientes CRM</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:var(--purple-subtle);color:var(--purple);"><i class="bi bi-gift"></i></div><div><div class="fw-bold">{{ stats.aniversariantes_mes }}</div><div class="text-muted" style="font-size:.78rem;">Aniversariantes</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:var(--success-subtle);color:var(--success);"><i class="bi bi-megaphone"></i></div><div><div class="fw-bold">{{ stats.campanhas_ativas }}</div><div class="text-muted" style="font-size:.78rem;">Campanhas Ativas</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:var(--danger-subtle);color:var(--danger);"><i class="bi bi-person-x"></i></div><div><div class="fw-bold">{{ stats.clientes_inativos_30d }}</div><div class="text-muted" style="font-size:.78rem;">Inativos 30d</div></div></div></div>
+</div>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header"><span><i class="bi bi-megaphone me-2 text-muted"></i>Campanhas</span></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0"><thead><tr><th>Nome</th><th>Periodo</th><th>Status</th><th>Acoes</th></tr></thead><tbody>
+                    {% for c in campanhas %}<tr><td class="fw-semibold">{{ c.nome }}</td><td style="font-size:.82rem;">{{ c.data_inicio|date:"d/m" }} - {{ c.data_fim|date:"d/m/Y" }}</td><td>{% if c.ativo %}<span class="badge bg-success">Ativa</span>{% endif %}</td><td><a href="{% url 'crm:campanha_editar' c.pk %}" class="btn btn-sm btn-ghost"><i class="bi bi-pencil"></i></a></td></tr>
+                    {% empty %}<tr><td colspan="4" class="text-center text-muted py-4">Nenhuma campanha.</td></tr>{% endfor %}
+                </tbody></table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header"><span><i class="bi bi-person-lines-fill me-2 text-muted"></i>Clientes CRM</span></div>
+            <div class="card-body p-0">
+                {% for c in clientes_crm %}<div class="d-flex align-items-center gap-3 px-3 py-2 border-bottom"><div class="user-avatar" style="width:32px;height:32px;font-size:.72rem;">{{ c.cliente.nome|first }}</div><div><div class="fw-semibold" style="font-size:.84rem;">{{ c.cliente.nome }}</div><div class="text-muted" style="font-size:.75rem;">Total gasto: R$ {{ c.total_gasto|floatformat:2 }}</div></div></div>
+                {% empty %}<p class="text-center text-muted py-4 mb-0">Nenhum cliente CRM.</p>{% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

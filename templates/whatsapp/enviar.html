@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Enviar WhatsApp - pharmaMS{% endblock %}
+{% block content %}
+<div class="page-header"><div><h5><i class="bi bi-send text-success me-2"></i>Enviar Mensagem WhatsApp</h5></div></div>
+<div class="row"><div class="col-lg-6">
+    <div class="card"><div class="card-body">
+        <form method="post">{% csrf_token %}
+            <div class="mb-3"><label class="form-label">Template (opcional)</label><select name="template_id" class="form-select" id="template-select"><option value="">Mensagem personalizada</option>{% for t in templates %}<option value="{{ t.pk }}">{{ t.nome }}</option>{% endfor %}</select></div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6"><label class="form-label">Nome do destinatario</label><input type="text" name="destinatario_nome" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">Telefone</label><input type="text" name="destinatario_telefone" class="form-control" placeholder="(00) 00000-0000" required></div>
+            </div>
+            <div class="mb-3"><label class="form-label">Mensagem</label><textarea name="mensagem" class="form-control" rows="6" required></textarea></div>
+            <button type="submit" class="btn btn-success"><i class="bi bi-whatsapp me-1"></i> Enviar</button>
+            <a href="{% url 'whatsapp:index' %}" class="btn btn-ghost">Cancelar</a>
+        </form>
+    </div></div>
+</div></div>
+{% endblock %}

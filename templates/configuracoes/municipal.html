@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações Municipais / Tributos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Configurações Municipais / Tributos</h1>
+</div>
+
+<div class="d-flex gap-4">
+  <nav class="config-sidebar" style="min-width: 220px;">
+    <div class="card">
+      <div class="card-header">Configurações</div>
+      <div class="card-body p-0">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'configuracoes:index' %}">Geral</a>
+          <a class="nav-link" href="{% url 'configuracoes:fiscal' %}">Fiscal</a>
+          <a class="nav-link active" href="{% url 'configuracoes:municipal' %}">Municipal / Tributos</a>
+          <a class="nav-link" href="{% url 'configuracoes:email' %}">E-mail</a>
+          <a class="nav-link" href="{% url 'configuracoes:backup' %}">Backup</a>
+        </nav>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex-grow-1">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Alíquotas -->
+      <div class="card mb-4">
+        <div class="card-header">Alíquotas</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="issqn" class="form-label">ISSQN (%)</label>
+              <input type="number" class="form-control" id="issqn" name="issqn" step="0.01" min="0" max="100" value="{{ municipal.issqn|default:'0' }}">
+            </div>
+            <div class="col-md-4">
+              <label for="pis" class="form-label">PIS (%)</label>
+              <input type="number" class="form-control" id="pis" name="pis" step="0.01" min="0" max="100" value="{{ municipal.pis|default:'0' }}">
+            </div>
+            <div class="col-md-4">
+              <label for="cofins" class="form-label">COFINS (%)</label>
+              <input type="number" class="form-control" id="cofins" name="cofins" step="0.01" min="0" max="100" value="{{ municipal.cofins|default:'0' }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="icms_padrao" class="form-label">ICMS Padrão (%)</label>
+              <input type="number" class="form-control" id="icms_padrao" name="icms_padrao" step="0.01" min="0" max="100" value="{{ municipal.icms_padrao|default:'0' }}">
+            </div>
+            <div class="col-md-6">
+              <label for="fcp" class="form-label">FCP (%)</label>
+              <input type="number" class="form-control" id="fcp" name="fcp" step="0.01" min="0" max="100" value="{{ municipal.fcp|default:'0' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dados de Tributação -->
+      <div class="card mb-4">
+        <div class="card-header">Dados de Tributação</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="cnae_principal" class="form-label">CNAE Principal</label>
+              <input type="text" class="form-control" id="cnae_principal" name="cnae_principal" value="{{ municipal.cnae_principal|default:'' }}">
+            </div>
+            <div class="col-md-6">
+              <label for="natureza_operacao" class="form-label">Natureza da Operação</label>
+              <input type="text" class="form-control" id="natureza_operacao" name="natureza_operacao" value="{{ municipal.natureza_operacao|default:'' }}">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="regime_tributario" class="form-label">Regime Tributário</label>
+            <select class="form-select" id="regime_tributario" name="regime_tributario">
+              <option value="1" {% if municipal.regime_tributario == '1' %}selected{% endif %}>1 - Simples Nacional</option>
+              <option value="2" {% if municipal.regime_tributario == '2' %}selected{% endif %}>2 - Excesso do Simples Nacional</option>
+              <option value="3" {% if municipal.regime_tributario == '3' %}selected{% endif %}>3 - Normal</option>
+              <option value="4" {% if municipal.regime_tributario == '4' %}selected{% endif %}>4 - MEI (Microempreendedor Individual)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+      <a href="{% url 'configuracoes:index' %}" class="btn btn-ghost">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

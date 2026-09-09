@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Regras de Comissao - pharmaMS{% endblock %}
+{% block page_title %}Regras de Comissão{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="{% url 'vendas:comissoes' %}" class="btn btn-outline-secondary btn-sm">Comissões</a>
+        <a href="{% url 'vendas:regras_comissao' %}" class="btn btn-outline-info btn-sm">Regras</a>
+    </div>
+    <a href="{% url 'vendas:regra_comissao_nova' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Nova Regra</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Tipo</th>
+                    <th>Produto</th>
+                    <th>Classe Terapêutica</th>
+                    <th>Vendedor</th>
+                    <th>Percentual</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Ativo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for regra in regras %}
+                <tr>
+                    <td>{{ regra.get_tipo_display }}</td>
+                    <td>{{ regra.produto|default:'---' }}</td>
+                    <td>{{ regra.classe_terapeutica|default:'---' }}</td>
+                    <td>{{ regra.vendedor|default:'---' }}</td>
+                    <td>{{ regra.percentual }}%</td>
+                    <td>{{ regra.data_inicio|date:'d/m/Y' }}</td>
+                    <td>{{ regra.data_fim|date:'d/m/Y'|default:'---' }}</td>
+                    <td>
+                        {% if regra.ativo %}
+                        <span class="badge bg-success">Sim</span>
+                        {% else %}
+                        <span class="badge bg-danger">Não</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'vendas:regra_comissao_editar' regra.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="text-center py-4 text-muted">Nenhuma regra de comissão cadastrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

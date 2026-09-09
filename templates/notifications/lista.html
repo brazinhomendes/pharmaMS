@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Notificações - pharmaMS{% endblock %}
+{% block page_title %}Notificações{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            {% for n in notificacoes %}
+            <div class="list-group-item d-flex justify-content-between align-items-center {% if not n.lida %}list-group-item-primary{% endif %}">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-{% if n.tipo == 'sucesso' %}check-circle text-success{% elif n.tipo == 'erro' %}x-circle text-danger{% elif n.tipo == 'alerta' %}exclamation-triangle text-warning{% else %}info-circle text-info{% endif %} fs-5"></i>
+                    <div>
+                        <strong>{{ n.titulo }}</strong>
+                        <p class="mb-0 text-muted small">{{ n.mensagem }}</p>
+                        <small class="text-muted">{{ n.criado_em|date:"d/m/Y H:i" }}</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    {% if not n.lida %}
+                    <a href="{% url 'notifications:marcar_lida' n.pk %}" class="btn btn-sm btn-outline-primary">Marcar lida</a>
+                    {% endif %}
+                    <span class="badge bg-{% if n.tipo == 'sucesso' %}success{% elif n.tipo == 'erro' %}danger{% elif n.tipo == 'alerta' %}warning{% else %}info{% endif %}">{{ n.get_tipo_display }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="list-group-item text-center text-muted py-4">Nenhuma notificação.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

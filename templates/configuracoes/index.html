@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações do Sistema{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Configurações do Sistema</h1>
+</div>
+
+<div class="d-flex gap-4">
+  <nav class="config-sidebar" style="min-width: 220px;">
+    <div class="card">
+      <div class="card-header">Configurações</div>
+      <div class="card-body p-0">
+        <nav class="nav flex-column">
+          <a class="nav-link active" href="{% url 'configuracoes:index' %}">Geral</a>
+          <a class="nav-link" href="{% url 'configuracoes:fiscal' %}">Fiscal</a>
+          <a class="nav-link" href="{% url 'configuracoes:municipal' %}">Municipal / Tributos</a>
+          <a class="nav-link" href="{% url 'configuracoes:email' %}">E-mail</a>
+          <a class="nav-link" href="{% url 'configuracoes:backup' %}">Backup</a>
+        </nav>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex-grow-1">
+    <div class="card">
+      <div class="card-header">Configurações Gerais</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="nome_sistema" class="form-label">Nome do Sistema</label>
+            <input type="text" class="form-control" id="nome_sistema" name="nome_sistema" value="{{ configuracao.nome_sistema|default:'' }}">
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="cor_primaria" class="form-label">Cor Primária</label>
+              <input type="color" class="form-control form-control-color" id="cor_primaria" name="cor_primaria" value="{{ configuracao.cor_primaria|default:'#0d6efd' }}">
+            </div>
+            <div class="col-md-6">
+              <label for="cor_secundaria" class="form-label">Cor Secundária</label>
+              <input type="color" class="form-control form-control-color" id="cor_secundaria" name="cor_secundaria" value="{{ configuracao.cor_secundaria|default:'#6c757d' }}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="tema_escuro" name="tema_escuro" {% if configuracao.tema_escuro %}checked{% endif %}>
+              <label class="form-check-label" for="tema_escuro">Tema Escuro</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="moeda" class="form-label">Moeda</label>
+            <select class="form-select" id="moeda" name="moeda">
+              <option value="BRL" {% if configuracao.moeda == 'BRL' %}selected{% endif %}>BRL - Real Brasileiro</option>
+              <option value="USD" {% if configuracao.moeda == 'USD' %}selected{% endif %}>USD - Dólar Americano</option>
+              <option value="EUR" {% if configuracao.moeda == 'EUR' %}selected{% endif %}>EUR - Euro</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="msg_pdv" class="form-label">Mensagem PDV</label>
+            <textarea class="form-control" id="msg_pdv" name="msg_pdv" rows="3">{{ configuracao.msg_pdv|default:'' }}</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

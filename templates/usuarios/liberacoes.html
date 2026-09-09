@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Liberacoes - pharmaMS{% endblock %}
+{% block page_title %}Liberacoes{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="{% url 'usuarios:liberacao_solicitar' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova Solicitacao</a>
+        <a href="{% url 'usuarios:liberacoes_pendentes' %}" class="btn btn-warning"><i class="bi bi-clock"></i> Pendentes</a>
+    </div>
+    <form method="get" class="d-flex gap-2">
+        <select name="tipo" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">Todos os tipos</option>
+            {% for key, label in TIPO_CHOICES %}
+            <option value="{{ key }}" {% if tipo_atual == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">Todos os status</option>
+            {% for key, label in STATUS_CHOICES %}
+            <option value="{{ key }}" {% if status_atual == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Usuario</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Aprovador</th>
+                        <th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lib in liberacoes %}
+                    <tr>
+                        <td>{{ lib.get_tipo_display }}</td>
+                        <td>{{ lib.usuario.nome_completo }}</td>
+                        <td>{{ lib.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if lib.status == 'pendente' %}
+                            <span class="badge bg-warning">Pendente</span>
+                            {% elif lib.status == 'aprovado' %}
+                            <span class="badge bg-success">Aprovado</span>
+                            {% else %}
+                            <span class="badge bg-danger">Rejeitado</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ lib.aprovador.nome_completo|default:'-' }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailModal{{ lib.pk }}">Detalhes</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Nenhuma liberacao encontrada.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% for lib in liberacoes %}
+<div class="modal fade" id="detailModal{{ lib.pk }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ lib.get_tipo_display }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Usuario:</strong> {{ lib.usuario.nome_completo }}</p>
+                <p><strong>Data:</strong> {{ lib.data_solicitacao|date:"d/m/Y H:i" }}</p>
+                <p><strong>Status:</strong> {{ lib.get_status_display }}</p>
+                <p><strong>Motivo:</strong> {{ lib.motivo }}</p>
+                {% if lib.venda %}<p><strong>Venda:</strong> {{ lib.venda }}</p>{% endif %}
+                {% if lib.dav %}<p><strong>DAV:</strong> {{ lib.dav }}</p>{% endif %}
+                {% if lib.nfce %}<p><strong>NFC-e:</strong> {{ lib.nfce }}</p>{% endif %}
+                {% if lib.aprovador %}
+                <p><strong>Aprovador:</strong> {{ lib.aprovador.nome_completo }}</p>
+                <p><strong>Data aprovacao:</strong> {{ lib.data_aprovacao|date:"d/m/Y H:i" }}</p>
+                {% endif %}
+                {% if lib.observacao_aprovador %}
+                <p><strong>Observacao do aprovador:</strong> {{ lib.observacao_aprovador }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

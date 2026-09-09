@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Gerar Sugestão - pharmaMS{% endblock %}
+{% block page_title %}Gerar Sugestão de Compra{% endblock %}
+{% block content %}
+
+<div class="card-dashboard p-4">
+    <form method="post">
+        {% csrf_token %}
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Data Início</label>
+                <input type="date" name="data_inicio" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Data Fim</label>
+                <input type="date" name="data_fim" class="form-control" required>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check">
+                    <input type="checkbox" name="apenas_curva_a" class="form-check-input" id="curvaA">
+                    <label class="form-check-label" for="curvaA">Apenas produtos Curva A</label>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-pharma"><i class="bi bi-magic"></i> Gerar Sugestão</button>
+            <a href="{% url 'compras:sugestoes' %}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

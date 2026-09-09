@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+{% block title %}Contas a Receber - pharmaMS{% endblock %}
+{% block page_title %}Contas a Receber{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h5>Contas a Receber</h5>
+    <div class="page-subtitle">Gerencie as contas a receber da empresa</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'financeiro:index' %}" class="btn btn-ghost"><i class="bi bi-arrow-left"></i> Voltar</a>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <form method="get" class="d-flex gap-2 flex-wrap w-100">
+    <input type="text" name="busca" class="form-control" placeholder="Buscar..." value="{{ busca }}" style="min-width:180px;">
+    <select name="status" class="form-select" style="min-width:130px;">
+      <option value="">Todos status</option>
+      <option value="pendente"{% if status_filtro == 'pendente' %} selected{% endif %}>Pendente</option>
+      <option value="pago"{% if status_filtro == 'pago' %} selected{% endif %}>Pago</option>
+      <option value="atrasada"{% if status_filtro == 'atrasada' %} selected{% endif %}>Atrasada</option>
+      <option value="cancelada"{% if status_filtro == 'cancelada' %} selected{% endif %}>Cancelada</option>
+    </select>
+    <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-search"></i></button>
+    <a href="{% url 'financeiro:contas_receber' %}" class="btn btn-ghost btn-sm">Limpar</a>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Descrição</th>
+            <th>Cliente</th>
+            <th>Valor</th>
+            <th>Vencimento</th>
+            <th>Status</th>
+            <th>Recebido em</th>
+            <th style="width:70px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in contas %}
+          <tr>
+            <td class="fw-medium">{{ c.descricao }}</td>
+            <td>{{ c.cliente.nome|default:"---" }}</td>
+            <td>R$ {{ c.valor|floatformat:2|intcomma }}</td>
+            <td>{{ c.data_vencimento|date:'d/m/Y' }}</td>
+            <td>
+              <span class="badge {% if c.status == 'pago' %}bg-success{% elif c.status == 'atrasada' %}bg-danger{% elif c.status == 'cancelada' %}bg-secondary{% else %}bg-warning text-dark{% endif %}">{{ c.get_status_display }}</span>
+            </td>
+            <td>{{ c.data_recebimento|date:'d/m/Y'|default:"---" }}</td>
+            <td>
+              <a href="{% url 'financeiro:conta_receber_editar' c.pk %}" class="btn btn-ghost btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7"><div class="empty-state"><i class="bi bi-currency-dollar"></i><h6>Nenhuma conta encontrada</h6></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

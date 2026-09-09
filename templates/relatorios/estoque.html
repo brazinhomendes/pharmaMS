@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Estoque - Relatórios{% endblock %}
+{% block page_title %}Estoque{% endblock %}
+{% block content %}
+<form method="get" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Alertar vencimento em até (dias)</label>
+                <input type="number" name="dias" class="form-control form-control-sm" value="{{ dias }}" min="1" max="365">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Produtos sem Estoque</small>
+                <h4 class="mb-0 text-danger">{{ produtos_sem_estoque|length }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Estoque Abaixo do Mínimo</small>
+                <h4 class="mb-0 text-warning">{{ produtos_estoque_baixo|length }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Lotes Próximos ao Vencimento</small>
+                <h4 class="mb-0 text-info">{{ lotes_proximos_validade|length }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <small class="text-muted">Lotes Vencidos</small>
+                <h4 class="mb-0 text-secondary">{{ lotes_vencidos|length }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent">
+                <h6 class="mb-0 text-danger">Produtos sem Estoque</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Produto</th><th>Código</th><th>Estoque Mínimo</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for p in produtos_sem_estoque %}
+                            <tr>
+                                <td>{{ p.nome }}</td>
+                                <td>{{ p.codigo_barras }}</td>
+                                <td>{{ p.estoque_minimo }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center py-4 text-muted">Nenhum produto sem estoque</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent">
+                <h6 class="mb-0 text-warning">Estoque Abaixo do Mínimo</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Produto</th><th>Código</th><th class="text-end">Estoque Atual</th><th class="text-end">Estoque Mínimo</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for p in produtos_estoque_baixo %}
+                            <tr>
+                                <td>{{ p.nome }}</td>
+                                <td>{{ p.codigo_barras }}</td>
+                                <td class="text-end text-danger">{{ p.estoque_atual }}</td>
+                                <td class="text-end">{{ p.estoque_minimo }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">Todos os produtos estão dentro do estoque mínimo</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent">
+                <h6 class="mb-0 text-info">Lotes Próximos ao Vencimento ({{ dias }} dias)</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Produto</th><th>Lote</th><th>Validade</th><th class="text-end">Dias Restantes</th><th class="text-end">Quantidade</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for l in lotes_proximos_validade %}
+                            <tr>
+                                <td>{{ l.produto.nome }}</td>
+                                <td>{{ l.codigo_lote }}</td>
+                                <td>{{ l.data_validade|date:"d/m/Y" }}</td>
+                                <td class="text-end {% if l.dias_para_vencer <= 30 %}text-danger{% else %}text-warning{% endif %}">{{ l.dias_para_vencer }} dias</td>
+                                <td class="text-end">{{ l.quantidade }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-4 text-muted">Nenhum lote próximo do vencimento</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h6 class="mb-0 text-secondary">Lotes Vencidos</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th>Produto</th><th>Lote</th><th>Validade</th><th class="text-end">Dias Vencido</th><th class="text-end">Quantidade</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for l in lotes_vencidos %}
+                            <tr>
+                                <td>{{ l.produto.nome }}</td>
+                                <td>{{ l.codigo_lote }}</td>
+                                <td>{{ l.data_validade|date:"d/m/Y" }}</td>
+                                <td class="text-end text-danger">{{ l.dias_para_vencer|add:"0"|cut:"-" }} dias</td>
+                                <td class="text-end">{{ l.quantidade }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-4 text-muted">Nenhum lote vencido</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

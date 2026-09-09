@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if empresa %}Editar {{ empresa.nome }}{% else %}Nova Empresa{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{% if empresa %}{{ empresa.nome }}{% else %}Nova Empresa{% endif %}</h1>
+        <p class="text-muted">{% if empresa %}Editar dados da empresa{% else %}Cadastrar nova empresa{% endif %}</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="id_nome" class="form-label">Nome</label>
+                    <input type="text" name="nome" id="id_nome" class="form-control" value="{{ empresa.nome|default:'' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="id_cnpj" class="form-label">CNPJ</label>
+                    <input type="text" name="cnpj" id="id_cnpj" class="form-control" value="{{ empresa.cnpj|default:'' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="id_ie" class="form-label">Inscricao Estadual</label>
+                    <input type="text" name="ie" id="id_ie" class="form-control" value="{{ empresa.ie|default:'' }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="id_telefone" class="form-label">Telefone</label>
+                    <input type="text" name="telefone" id="id_telefone" class="form-control" value="{{ empresa.telefone|default:'' }}">
+                </div>
+                <div class="col-md-12">
+                    <label for="id_endereco" class="form-label">Endereco</label>
+                    <input type="text" name="endereco" id="id_endereco" class="form-control" value="{{ empresa.endereco|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="id_bairro" class="form-label">Bairro</label>
+                    <input type="text" name="bairro" id="id_bairro" class="form-control" value="{{ empresa.bairro|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="id_cidade" class="form-label">Cidade</label>
+                    <input type="text" name="cidade" id="id_cidade" class="form-control" value="{{ empresa.cidade|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="id_uf" class="form-label">UF</label>
+                    <select name="uf" id="id_uf" class="form-select" required>
+                        <option value="">Selecione...</option>
+                        {% for codigo, nome in uf_choices %}
+                        <option value="{{ codigo }}" {% if empresa.uf == codigo %}selected{% endif %}>{{ nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="id_cep" class="form-label">CEP</label>
+                    <input type="text" name="cep" id="id_cep" class="form-control" value="{{ empresa.cep|default:'' }}" required>
+                </div>
+                <div class="col-md-8">
+                    <label for="id_email" class="form-label">Email</label>
+                    <input type="email" name="email" id="id_email" class="form-control" value="{{ empresa.email|default:'' }}">
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> {% if empresa %}Salvar Alteracoes{% else %}Cadastrar Empresa{% endif %}
+                </button>
+                <a href="{% url 'system_admin:empresas_lista' %}" class="btn btn-ghost">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

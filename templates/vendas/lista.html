@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+{% block title %}Vendas - pharmaMS{% endblock %}
+{% block page_title %}Vendas{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5>Vendas</h5>
+        <div class="page-subtitle">{{ vendas.count }} venda{{ vendas.count|pluralize }} encontrada{{ vendas.count|pluralize }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'vendas:promocoes' %}" class="btn btn-ghost"><i class="bi bi-tags"></i> Promoções</a>
+        <a href="{% url 'vendas:comissoes' %}" class="btn btn-ghost"><i class="bi bi-percent"></i> Comissões</a>
+        <a href="{% url 'pdv:index' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nova Venda</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 animate-fade-in">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:var(--primary-light);color:var(--primary);font-size:1.1rem;">
+                    <i class="bi bi-cart-check"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">R$ {{ total_hoje|floatformat:2 }}</div>
+                    <div class="stat-label">{% if periodo_label %}{{ periodo_label }}{% else %}Vendas Hoje{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 animate-fade-in-delay-1">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:var(--success-light);color:var(--success);font-size:1.1rem;">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">{{ qtd_hoje }}</div>
+                    <div class="stat-label">{% if periodo_label %}{{ periodo_label }}{% else %}Pedidos Hoje{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 animate-fade-in-delay-2">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:var(--warning-light);color:var(--warning);font-size:1.1rem;">
+                    <i class="bi bi-calendar3"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">R$ {{ total_mes|floatformat:2 }}</div>
+                    <div class="stat-label">{% if periodo_label %}{{ periodo_label }}{% else %}Vendas do Mês{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 animate-fade-in-delay-3">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:#fce7f3;color:#ec4899;font-size:1.1rem;">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">R$ {{ ticket_medio|floatformat:2 }}</div>
+                    <div class="stat-label">{% if periodo_label %}Ticket Médio ({{ periodo_label }}){% else %}Ticket Médio (Mês){% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="filter-bar">
+    <a href="{% url 'vendas:lista' %}" class="btn btn-ghost btn-sm {% if periodo_atual == 'todas' %}active{% endif %}">Todas</a>
+    <a href="{% url 'vendas:lista' %}?periodo=hoje" class="btn btn-ghost btn-sm {% if periodo_atual == 'hoje' %}active{% endif %}">Hoje</a>
+    <a href="{% url 'vendas:lista' %}?periodo=mes" class="btn btn-ghost btn-sm {% if periodo_atual == 'mes' %}active{% endif %}">Este Mês</a>
+    <a href="{% url 'vendas:lista' %}?periodo=30d" class="btn btn-ghost btn-sm {% if periodo_atual == '30d' %}active{% endif %}">30 Dias</a>
+    <div class="vr mx-1" style="height:24px;"></div>
+    <input type="date" name="data_inicio" class="form-control form-control-sm" style="width:fit-content;" value="{{ data_inicio }}" placeholder="Data início">
+    <span style="color:var(--text-muted);font-size:.8rem;">até</span>
+    <input type="date" name="data_fim" class="form-control form-control-sm" style="width:fit-content;" value="{{ data_fim }}" placeholder="Data fim">
+    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
+    {% if data_inicio or data_fim or periodo_atual != 'todas' %}
+    <a href="{% url 'vendas:lista' %}" class="btn btn-ghost btn-sm"><i class="bi bi-x-lg"></i> Limpar</a>
+    {% endif %}
+    <input type="hidden" name="status" value="{{ status_atual }}">
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Pagamento</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th style="width:80px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venda in vendas %}
+                <tr>
+                    <td class="fw-medium">{{ venda.numero_venda }}</td>
+                    <td>{{ venda.cliente|default:'---' }}</td>
+                    <td><strong>R$ {{ venda.total|floatformat:2 }}</strong></td>
+                    <td><span class="badge badge-pharma">{{ venda.get_forma_pagamento_display }}</span></td>
+                    <td>
+                        <span class="badge {% if venda.status == 'finalizada' %}bg-success{% elif venda.status == 'cancelada' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                            {{ venda.get_status_display }}
+                        </span>
+                    </td>
+                    <td style="color:var(--text-secondary);font-size:.82rem;">{{ venda.data_venda|date:'d/m/Y H:i' }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'vendas:detalhe' venda.pk %}" class="btn btn-ghost btn-icon" title="Detalhe">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if venda.status == 'aberta' %}
+                            <a href="{% url 'vendas:cancelar' venda.pk %}" class="btn btn-ghost btn-icon" style="color:var(--danger);" onclick="return confirm('Cancelar esta venda?')" title="Cancelar">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="bi bi-receipt"></i>
+                            <h6>Nenhuma venda encontrada</h6>
+                            <p>As vendas realizadas no PDV aparecerão aqui.</p>
+                            <a href="{% url 'pdv:index' %}" class="btn btn-primary mt-2">
+                                <i class="bi bi-cart3"></i> Ir para PDV
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

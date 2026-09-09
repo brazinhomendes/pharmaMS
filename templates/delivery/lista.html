@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+{% block title %}Delivery - pharmaMS{% endblock %}
+{% block page_title %}Delivery{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5>Delivery</h5>
+        <div class="page-subtitle">{{ entregas.count }} entrega{{ entregas.count|pluralize }} encontrada{{ entregas.count|pluralize }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'delivery:novo' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 animate-fade-in">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:var(--primary-light);color:var(--primary);font-size:1.1rem;">
+                    <i class="bi bi-bicycle"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">{{ total_hoje }}</div>
+                    <div class="stat-label">Entregas Hoje</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 animate-fade-in-delay-1">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:var(--warning-light);color:var(--warning);font-size:1.1rem;">
+                    <i class="bi bi-clock"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">{{ pendentes }}</div>
+                    <div class="stat-label">Pendentes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 animate-fade-in-delay-2">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:var(--info-light);color:var(--info);font-size:1.1rem;">
+                    <i class="bi bi-truck"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">{{ em_rota }}</div>
+                    <div class="stat-label">Em Rota</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 animate-fade-in-delay-3">
+        <div class="card-dashboard">
+            <div class="stat-card" style="padding:1rem;">
+                <div class="stat-icon" style="width:40px;height:40px;background:var(--success-light);color:var(--success);font-size:1.1rem;">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-number" style="font-size:1.25rem;">{{ concluidas_hoje }}</div>
+                    <div class="stat-label">Concluídas Hoje</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="filter-bar">
+    <a href="{% url 'delivery:lista' %}" class="btn btn-ghost btn-sm {% if periodo_atual == 'todas' %}active{% endif %}">Todas</a>
+    <a href="{% url 'delivery:lista' %}?periodo=hoje" class="btn btn-ghost btn-sm {% if periodo_atual == 'hoje' %}active{% endif %}">Hoje</a>
+    <a href="{% url 'delivery:lista' %}?periodo=semana" class="btn btn-ghost btn-sm {% if periodo_atual == 'semana' %}active{% endif %}">7 Dias</a>
+    <a href="{% url 'delivery:lista' %}?periodo=mes" class="btn btn-ghost btn-sm {% if periodo_atual == 'mes' %}active{% endif %}">Este Mês</a>
+    <div class="vr mx-1" style="height:24px;"></div>
+    <input type="date" name="data_inicio" class="form-control form-control-sm" style="width:fit-content;" value="{{ data_inicio }}">
+    <span style="color:var(--text-muted);font-size:.8rem;">até</span>
+    <input type="date" name="data_fim" class="form-control form-control-sm" style="width:fit-content;" value="{{ data_fim }}">
+    <div class="vr mx-1" style="height:24px;"></div>
+    <input type="text" name="busca" class="form-control form-control-sm" style="width:180px;" placeholder="Buscar cliente/endereço..." value="{{ busca }}">
+    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
+    {% if busca or data_inicio or data_fim or periodo_atual != 'todas' %}
+    <a href="{% url 'delivery:lista' %}" class="btn btn-ghost btn-sm"><i class="bi bi-x-lg"></i> Limpar</a>
+    {% endif %}
+    <input type="hidden" name="status" value="{{ status_atual }}">
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Endereço</th>
+                    <th>Status</th>
+                    <th>Entregador</th>
+                    <th>Taxa</th>
+                    <th style="width:80px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entrega in entregas %}
+                <tr>
+                    <td class="fw-medium">{{ entrega.pk }}</td>
+                    <td>
+                        {% if entrega.cliente %}
+                            {{ entrega.cliente.nome }}
+                        {% elif entrega.venda and entrega.venda.cliente %}
+                            {{ entrega.venda.cliente.nome }}
+                        {% else %}
+                            ---
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ entrega.endereco_entrega }}{% if entrega.complemento %}, {{ entrega.complemento }}{% endif %}
+                        <br><small class="text-muted">{{ entrega.bairro }}{% if entrega.cidade %} - {{ entrega.cidade }}{% endif %}</small>
+                    </td>
+                    <td>
+                        <span class="badge {% if entrega.status == 'entregue' %}bg-success{% elif entrega.status == 'cancelada' %}bg-secondary{% elif entrega.status == 'em_rota' %}bg-info{% elif entrega.status == 'atribuido' %}bg-primary{% else %}bg-warning text-dark{% endif %}">
+                            {{ entrega.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{% if entrega.entregador %}{{ entrega.entregador.nome_completo|default:entrega.entregador.username }}{% else %}-{% endif %}</td>
+                    <td>R$ {{ entrega.taxa_entrega|floatformat:2|intcomma }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'delivery:detalhe' entrega.pk %}" class="btn btn-ghost btn-icon" title="Detalhe">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="bi bi-bicycle"></i>
+                            <h6>Nenhuma entrega encontrada</h6>
+                            <p>As entregas cadastradas aparecerão aqui.</p>
+                            <a href="{% url 'delivery:novo' %}" class="btn btn-primary mt-2">
+                                <i class="bi bi-plus-lg"></i> Nova Entrega
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

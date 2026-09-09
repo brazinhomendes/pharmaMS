@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Estoque - pharmaMS{% endblock %}
+{% block page_title %}Estoque{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6 animate-fade-in">
+        <div class="card-dashboard">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:var(--primary-light);color:var(--primary);">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_produtos }}</div>
+                    <div class="stat-label">Produtos com Estoque</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 animate-fade-in-delay-1">
+        <div class="card-dashboard">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:var(--success-light);color:var(--success);">
+                    <i class="bi bi-archive"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_lotes }}</div>
+                    <div class="stat-label">Total de Lotes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 animate-fade-in-delay-2">
+        <div class="card-dashboard">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:var(--warning-light);color:var(--warning);">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ lotes_proximos|length }}</div>
+                    <div class="stat-label">Próximos a Vencer</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 animate-fade-in-delay-3">
+        <div class="card-dashboard">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:var(--danger-light);color:var(--danger);">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ lotes_vencidos }}</div>
+                    <div class="stat-label">Lotes Vencidos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 animate-fade-in">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock me-1" style="color:var(--warning);"></i> Próximos a Vencer</span>
+                <a href="{% url 'estoque:lotes' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Lote</th>
+                            <th>Validade</th>
+                            <th>Qtd</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lote in lotes_proximos %}
+                        <tr>
+                            <td class="fw-medium">{{ lote.produto.nome }}</td>
+                            <td><code style="background:var(--body-bg);padding:2px 6px;border-radius:4px;font-size:.75rem;">{{ lote.codigo_lote }}</code></td>
+                            <td style="color:var(--text-secondary);font-size:.82rem;">{{ lote.data_validade|date:"d/m/Y" }}</td>
+                            <td>{{ lote.quantidade }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-4">Nenhum lote próximo a vencer.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-arrow-left-right me-1" style="color:var(--primary);"></i> Últimos Movimentos</span>
+                <a href="{% url 'estoque:movimentos' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Produto</th>
+                            <th>Qtd</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mov in movimentos %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-{% if mov.tipo == 'entrada' %}success{% elif mov.tipo == 'saida' %}danger{% elif mov.tipo == 'perda' %}warning{% else %}secondary{% endif %}">
+                                    {{ mov.get_tipo_display }}
+                                </span>
+                            </td>
+                            <td class="fw-medium">{{ mov.produto.nome }}</td>
+                            <td>{{ mov.quantidade }}</td>
+                            <td style="color:var(--text-secondary);font-size:.82rem;">{{ mov.criado_em|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-4">Nenhum movimento registrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

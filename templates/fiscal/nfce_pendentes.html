@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}NFC-e em Contingencia - pharmaMS{% endblock %}
+{% block page_title %}NFC-e em Contingencia{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span style="color:var(--text-muted);">{{ nfces|length }} nota(s) pendente(s)</span>
+    <form method="POST" action="{% url 'fiscal:nfce_reemitir' %}" class="d-inline">
+        {% csrf_token %}
+        <button class="btn btn-success btn-sm" onclick="return confirm('Reemitir todas as NFC-e pendentes?')">
+            <i class="bi bi-send-check"></i> Reemitir Pendentes
+        </button>
+    </form>
+</div>
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Chave Acesso</th>
+                    <th>NFC-e</th>
+                    <th>Venda</th>
+                    <th>Cliente</th>
+                    <th>Valor</th>
+                    <th>Emissao</th>
+                    <th>Justificativa</th>
+                    <th>Acoes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nfce in nfces %}
+                <tr>
+                    <td><code style="font-size:.75rem;">{{ nfce.chave_acesso }}</code></td>
+                    <td><strong>{{ nfce.numero }}</strong></td>
+                    <td>{{ nfce.venda.numero_venda }}</td>
+                    <td>{{ nfce.venda.cliente.nome|default:'--' }}</td>
+                    <td>R$ {{ nfce.venda.total|floatformat:2|intcomma }}</td>
+                    <td>{{ nfce.data_emissao|date:'d/m/Y H:i' }}</td>
+                    <td><small>{{ nfce.justificativa_contingencia|truncatewords:10|default:'--' }}</small></td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'fiscal:nfce_detalhe' nfce.pk %}" class="btn btn-outline-primary"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'fiscal:nfce_danfe' nfce.pk %}" class="btn btn-outline-secondary" target="_blank"><i class="bi bi-printer"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center py-4" style="color:var(--text-muted);">Nenhuma NFC-e pendente encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

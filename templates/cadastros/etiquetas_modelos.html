@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Modelos de Etiquetas - pharmaMS{% endblock %}
+{% block page_title %}Modelos de Etiquetas{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Modelos Cadastrados</h5>
+    <a href="{% url 'cadastros:etiqueta_modelo_novo' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg"></i> Novo Modelo
+    </a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tamanho (mm)</th>
+                        <th>Colunas</th>
+                        <th>Linhas</th>
+                        <th>Mostrar</th>
+                        <th>Ativo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in modelos %}
+                    <tr>
+                        <td>{{ m.nome }}</td>
+                        <td>{{ m.largura_mm }} x {{ m.altura_mm }}</td>
+                        <td>{{ m.colunas }}</td>
+                        <td>{{ m.linhas }}</td>
+                        <td>
+                            {% if m.mostrar_nome %}<span class="badge bg-info">Nome</span>{% endif %}
+                            {% if m.mostrar_preco %}<span class="badge bg-success">Preço</span>{% endif %}
+                            {% if m.mostrar_codigo_barras %}<span class="badge bg-secondary">Cód.</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if m.ativo %}
+                            <span class="badge bg-success">Sim</span>
+                            {% else %}
+                            <span class="badge bg-danger">Não</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'cadastros:etiqueta_modelo_editar' m.id %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted">Nenhum modelo cadastrado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

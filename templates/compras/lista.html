@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Compras - pharmaMS{% endblock %}
+{% block page_title %}Pedidos de Compra{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5>Pedidos de Compra</h5>
+        <div class="page-subtitle">{{ pedidos.count }} pedido{{ pedidos.count|pluralize }} registrado{{ pedidos.count|pluralize }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'compras:sugestoes' %}" class="btn btn-ghost"><i class="bi bi-lightbulb"></i> Sugestões</a>
+        <a href="{% url 'compras:novo' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Novo Pedido</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nº Pedido</th>
+                    <th>Fornecedor</th>
+                    <th>Data</th>
+                    <th>Previsão</th>
+                    <th>Status</th>
+                    <th>Itens</th>
+                    <th style="width:80px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr>
+                    <td class="fw-medium">{{ pedido.numero_pedido }}</td>
+                    <td>{{ pedido.fornecedor.nome }}</td>
+                    <td style="color:var(--text-secondary);font-size:.82rem;">{{ pedido.data_pedido|date:"d/m/Y" }}</td>
+                    <td style="color:var(--text-secondary);font-size:.82rem;">{{ pedido.data_previsao|date:"d/m/Y"|default:"-" }}</td>
+                    <td>
+                        <span class="badge bg-{% if pedido.status == 'rascunho' %}secondary{% elif pedido.status == 'enviado' %}primary{% elif pedido.status == 'recebido' %}success{% elif pedido.status == 'parcial' %}warning{% elif pedido.status == 'cancelado' %}danger{% endif %}">
+                            {{ pedido.get_status_display }}
+                        </span>
+                    </td>
+                    <td><span class="badge bg-light text-dark">{{ pedido.itens.count }}</span></td>
+                    <td>
+                        <a href="{% url 'compras:detalhe' pedido.pk %}" class="btn btn-ghost btn-icon">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="bi bi-bag-plus"></i>
+                            <h6>Nenhum pedido de compra</h6>
+                            <p>Crie pedidos de compra para gerenciar seu estoque.</p>
+                            <a href="{% url 'compras:novo' %}" class="btn btn-primary mt-2">
+                                <i class="bi bi-plus-lg"></i> Novo Pedido
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

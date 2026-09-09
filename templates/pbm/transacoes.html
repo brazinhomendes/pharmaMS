@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Transações PBM - pharmaMS{% endblock %}
+{% block page_title %}Transações PBM{% endblock %}
+{% block content %}
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Operadora</th>
+                    <th>Venda</th>
+                    <th>Valor Total</th>
+                    <th>Desconto</th>
+                    <th>Repassado</th>
+                    <th>Status</th>
+                    <th>Autorização</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transacoes %}
+                <tr>
+                    <td><strong>{{ t.operadora.nome }}</strong></td>
+                    <td>#{{ t.venda.numero_venda }}</td>
+                    <td>R$ {{ t.valor_total|floatformat:2|intcomma }}</td>
+                    <td>R$ {{ t.valor_desconto|floatformat:2|intcomma }}</td>
+                    <td>R$ {{ t.valor_repassado|floatformat:2|intcomma }}</td>
+                    <td>
+                        <span class="badge {% if t.status == 'autorizada' %}bg-success{% elif t.status == 'processada' %}bg-info text-dark{% elif t.status == 'negada' or t.status == 'cancelada' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                            {{ t.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ t.numero_autorizacao|default:'---' }}</td>
+                    <td>{{ t.criado_em|date:'d/m/Y H:i' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center py-4" style="color:var(--text-muted);">Nenhuma transação encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

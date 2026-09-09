@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}{% if modelo %}Editar{% else %}Novo{% endif %} Modelo de Etiqueta - pharmaMS{% endblock %}
+{% block page_title %}{% if modelo %}Editar{% else %}Novo{% endif %} Modelo de Etiqueta{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nome *</label>
+                    <input type="text" name="nome" class="form-control" required value="{{ modelo.nome|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Largura (mm)</label>
+                    <input type="number" step="0.1" name="largura_mm" class="form-control" value="{{ modelo.largura_mm|default:'40' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Altura (mm)</label>
+                    <input type="number" step="0.1" name="altura_mm" class="form-control" value="{{ modelo.altura_mm|default:'25' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Margem Superior (mm)</label>
+                    <input type="number" step="0.1" name="margem_superior" class="form-control" value="{{ modelo.margem_superior|default:'3' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Margem Inferior (mm)</label>
+                    <input type="number" step="0.1" name="margem_inferior" class="form-control" value="{{ modelo.margem_inferior|default:'3' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Margem Esquerda (mm)</label>
+                    <input type="number" step="0.1" name="margem_esquerda" class="form-control" value="{{ modelo.margem_esquerda|default:'3' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Margem Direita (mm)</label>
+                    <input type="number" step="0.1" name="margem_direita" class="form-control" value="{{ modelo.margem_direita|default:'3' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Colunas</label>
+                    <input type="number" name="colunas" class="form-control" value="{{ modelo.colunas|default:'3' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Linhas</label>
+                    <input type="number" name="linhas" class="form-control" value="{{ modelo.linhas|default:'8' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tamanho da Fonte</label>
+                    <input type="number" name="fonte_tamanho" class="form-control" value="{{ modelo.fonte_tamanho|default:'10' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cabeçalho</label>
+                    <input type="text" name="cabecalho" class="form-control" value="{{ modelo.cabecalho|default:'' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Rodapé</label>
+                    <input type="text" name="rodape" class="form-control" value="{{ modelo.rodape|default:'' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Campos a Exibir</label>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="mostrar_nome" class="form-check-input" id="mostrar_nome" {% if modelo.mostrar_nome or not modelo %}checked{% endif %}>
+                                <label class="form-check-label" for="mostrar_nome">Nome</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="mostrar_preco" class="form-check-input" id="mostrar_preco" {% if modelo.mostrar_preco or not modelo %}checked{% endif %}>
+                                <label class="form-check-label" for="mostrar_preco">Preço de Venda</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="mostrar_codigo_barras" class="form-check-input" id="mostrar_codigo_barras" {% if modelo.mostrar_codigo_barras or not modelo %}checked{% endif %}>
+                                <label class="form-check-label" for="mostrar_codigo_barras">Código de Barras</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="mostrar_preco_custo" class="form-check-input" id="mostrar_preco_custo" {% if modelo.mostrar_preco_custo %}checked{% endif %}>
+                                <label class="form-check-label" for="mostrar_preco_custo">Preço de Custo</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="mostrar_laboratorio" class="form-check-input" id="mostrar_laboratorio" {% if modelo.mostrar_laboratorio %}checked{% endif %}>
+                                <label class="form-check-label" for="mostrar_laboratorio">Laboratório</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="mostrar_validade" class="form-check-input" id="mostrar_validade" {% if modelo.mostrar_validade %}checked{% endif %}>
+                                <label class="form-check-label" for="mostrar_validade">Validade</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="{% url 'cadastros:etiquetas_modelos' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

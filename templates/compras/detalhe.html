@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Pedido {{ pedido.numero_pedido }} - pharmaMS{% endblock %}
+{% block page_title %}Pedido {{ pedido.numero_pedido }}{% endblock %}
+{% block content %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="card-dashboard p-3">
+            <h6 class="fw-semibold mb-3">Informações</h6>
+            <table class="table table-sm">
+                <tr><th style="width:140px">Fornecedor:</th><td>{{ pedido.fornecedor.nome }}</td></tr>
+                <tr><th>Data Pedido:</th><td>{{ pedido.data_pedido|date:"d/m/Y" }}</td></tr>
+                <tr><th>Previsão:</th><td>{{ pedido.data_previsao|date:"d/m/Y"|default:"-" }}</td></tr>
+                <tr><th>Status:</th>
+                    <td>
+                        <span class="badge bg-{% if pedido.status == 'rascunho' %}secondary{% elif pedido.status == 'enviado' %}primary{% elif pedido.status == 'recebido' %}success{% elif pedido.status == 'parcial' %}warning{% elif pedido.status == 'cancelado' %}danger{% endif %}">
+                            {{ pedido.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                <tr><th>Observações:</th><td>{{ pedido.observacoes|default:"-"|linebreaks }}</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4 d-flex align-items-start justify-content-end gap-2">
+        {% if pedido.status == 'rascunho' or pedido.status == 'parcial' %}
+        <a href="{% url 'compras:receber' pedido.pk %}" class="btn btn-success">
+            <i class="bi bi-check-lg"></i> Receber Itens
+        </a>
+        {% endif %}
+        <a href="{% url 'compras:lista' %}" class="btn btn-outline-secondary">Voltar</a>
+    </div>
+</div>
+
+<div class="card-dashboard p-0">
+    <table class="table table-pharma mb-0">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Preço Unit.</th>
+                <th>Subtotal</th>
+                <th>Recebido</th>
+                <th>Pendente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in pedido.itens.all %}
+            <tr>
+                <td>{{ item.produto.nome }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                <td>R$ {{ item.subtotal|floatformat:2 }}</td>
+                <td>{{ item.quantidade_recebida }}</td>
+                <td>{{ item.pendente }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

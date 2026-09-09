@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Movimentações SNGPC - pharmaMS{% endblock %}
+{% block page_title %}Movimentações SNGPC{% endblock %}
+{% block content %}
+<div class="card-dashboard p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Medicamento</th>
+                    <th>Tipo</th>
+                    <th>Quantidade</th>
+                    <th>Lote</th>
+                    <th>Receituário</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mov in movimentacoes %}
+                <tr>
+                    <td><strong>{{ mov.medicamento.produto.nome }}</strong></td>
+                    <td>
+                        <span class="badge {% if mov.tipo == 'entrada' %}bg-success{% elif mov.tipo == 'saida' %}bg-danger{% elif mov.tipo == 'perda' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ mov.get_tipo_display }}
+                        </span>
+                    </td>
+                    <td>{{ mov.quantidade }}</td>
+                    <td>{{ mov.lote|default:'---' }}</td>
+                    <td>{{ mov.receituario.numero_receita|default:'---' }}</td>
+                    <td>{{ mov.data_movimento|date:'d/m/Y H:i' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted);">Nenhuma movimentação encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

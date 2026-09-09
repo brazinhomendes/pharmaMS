@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações de E-mail{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Configurações de E-mail</h1>
+</div>
+
+<div class="d-flex gap-4">
+  <nav class="config-sidebar" style="min-width: 220px;">
+    <div class="card">
+      <div class="card-header">Configurações</div>
+      <div class="card-body p-0">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'configuracoes:index' %}">Geral</a>
+          <a class="nav-link" href="{% url 'configuracoes:fiscal' %}">Fiscal</a>
+          <a class="nav-link" href="{% url 'configuracoes:municipal' %}">Municipal / Tributos</a>
+          <a class="nav-link active" href="{% url 'configuracoes:email' %}">E-mail</a>
+          <a class="nav-link" href="{% url 'configuracoes:backup' %}">Backup</a>
+        </nav>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex-grow-1">
+    <div class="card">
+      <div class="card-header">Configurações de E-mail (SMTP)</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="row mb-3">
+            <div class="col-md-8">
+              <label for="smtp_host" class="form-label">Servidor SMTP</label>
+              <input type="text" class="form-control" id="smtp_host" name="smtp_host" value="{{ email.smtp_host|default:'' }}" placeholder="smtp.exemplo.com.br">
+            </div>
+            <div class="col-md-4">
+              <label for="smtp_port" class="form-label">Porta SMTP</label>
+              <input type="number" class="form-control" id="smtp_port" name="smtp_port" value="{{ email.smtp_port|default:'587' }}">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="smtp_user" class="form-label">Usuário SMTP</label>
+              <input type="text" class="form-control" id="smtp_user" name="smtp_user" value="{{ email.smtp_user|default:'' }}">
+            </div>
+            <div class="col-md-6">
+              <label for="smtp_senha" class="form-label">Senha SMTP</label>
+              <input type="password" class="form-control" id="smtp_senha" name="smtp_senha">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="smtp_usa_tls" name="smtp_usa_tls" {% if email.smtp_usa_tls %}checked{% endif %}>
+              <label class="form-check-label" for="smtp_usa_tls">Utilizar TLS</label>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="email_remetente" class="form-label">E-mail do Remetente</label>
+              <input type="email" class="form-control" id="email_remetente" name="email_remetente" value="{{ email.email_remetente|default:'' }}">
+            </div>
+            <div class="col-md-6">
+              <label for="nome_remetente" class="form-label">Nome do Remetente</label>
+              <input type="text" class="form-control" id="nome_remetente" name="nome_remetente" value="{{ email.nome_remetente|default:'' }}">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+          <a href="{% url 'configuracoes:index' %}" class="btn btn-ghost">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

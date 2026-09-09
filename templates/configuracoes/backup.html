@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações de Backup{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Configurações de Backup</h1>
+</div>
+
+<div class="d-flex gap-4">
+  <nav class="config-sidebar" style="min-width: 220px;">
+    <div class="card">
+      <div class="card-header">Configurações</div>
+      <div class="card-body p-0">
+        <nav class="nav flex-column">
+          <a class="nav-link" href="{% url 'configuracoes:index' %}">Geral</a>
+          <a class="nav-link" href="{% url 'configuracoes:fiscal' %}">Fiscal</a>
+          <a class="nav-link" href="{% url 'configuracoes:municipal' %}">Municipal / Tributos</a>
+          <a class="nav-link" href="{% url 'configuracoes:email' %}">E-mail</a>
+          <a class="nav-link active" href="{% url 'configuracoes:backup' %}">Backup</a>
+        </nav>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex-grow-1">
+    <div class="card">
+      <div class="card-header">Configurações de Backup</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backup_automatico" name="backup_automatico" {% if backup.backup_automatico %}checked{% endif %}>
+              <label class="form-check-label" for="backup_automatico">Backup Automático</label>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="backup_frequencia" class="form-label">Frequência</label>
+              <select class="form-select" id="backup_frequencia" name="backup_frequencia">
+                <option value="diario" {% if backup.backup_frequencia == 'diario' %}selected{% endif %}>Diário</option>
+                <option value="semanal" {% if backup.backup_frequencia == 'semanal' %}selected{% endif %}>Semanal</option>
+                <option value="mensal" {% if backup.backup_frequencia == 'mensal' %}selected{% endif %}>Mensal</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="backup_hora" class="form-label">Horário</label>
+              <input type="time" class="form-control" id="backup_hora" name="backup_hora" value="{{ backup.backup_hora|default:'02:00' }}">
+            </div>
+            <div class="col-md-4">
+              <label for="backup_manter_dias" class="form-label">Manter por (dias)</label>
+              <input type="number" class="form-control" id="backup_manter_dias" name="backup_manter_dias" min="1" value="{{ backup.backup_manter_dias|default:'30' }}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="backup_local" class="form-label">Diretório de Backup</label>
+            <input type="text" class="form-control" id="backup_local" name="backup_local" value="{{ backup.backup_local|default:'' }}" placeholder="/caminho/para/backup">
+          </div>
+
+          <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+          <a href="{% url 'configuracoes:index' %}" class="btn btn-ghost">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

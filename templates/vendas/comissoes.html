@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Comissoes - pharmaMS{% endblock %}
+{% block page_title %}Comissões de Vendedores{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a href="{% url 'vendas:comissoes' %}" class="btn btn-outline-secondary btn-sm">Comissões</a>
+        <a href="{% url 'vendas:regras_comissao' %}" class="btn btn-outline-info btn-sm">Regras</a>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header"><strong>Resumo por Vendedor</strong></div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Vendedor</th>
+                    <th>Total em Comissões</th>
+                    <th>Pendentes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vendedores %}
+                <tr>
+                    <td>{{ v.vendedor__nome_completo|default:v.vendedor__username }}</td>
+                    <td>R$ {{ v.total|floatformat:2 }}</td>
+                    <td>
+                        {% if v.pendentes %}
+                        <span class="text-warning">R$ {{ v.pendentes|floatformat:2 }}</span>
+                        {% else %}
+                        <span class="text-success">R$ 0,00</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center py-4 text-muted">Nenhuma comissão encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><strong>Todas as Comissões</strong></div>
+    <div class="card-body p-0">
+        <form method="post" action="{% url 'vendas:comissoes_pagar' %}">
+            {% csrf_token %}
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>Venda</th>
+                        <th>Vendedor</th>
+                        <th>Item</th>
+                        <th>%</th>
+                        <th>Valor Base</th>
+                        <th>Valor Comissão</th>
+                        <th>Paga</th>
+                        <th>Data Pag.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in comissoes %}
+                    <tr>
+                        <td>
+                            {% if not c.paga %}
+                            <input type="checkbox" name="comissoes" value="{{ c.id }}">
+                            {% endif %}
+                        </td>
+                        <td><a href="{% url 'vendas:detalhe' c.venda_id %}">#{{ c.venda.numero_venda }}</a></td>
+                        <td>{{ c.vendedor.nome_completo|default:c.vendedor.username }}</td>
+                        <td>{{ c.item_venda.produto.nome|default:'---' }}</td>
+                        <td>{{ c.percentual }}%</td>
+                        <td>R$ {{ c.valor_base|floatformat:2 }}</td>
+                        <td>R$ {{ c.valor_comissao|floatformat:2 }}</td>
+                        <td>
+                            {% if c.paga %}
+                            <span class="badge bg-success">Paga</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Pendente</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ c.data_pagamento|date:'d/m/Y'|default:'---' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="9" class="text-center py-4 text-muted">Nenhuma comissão registrada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if comissoes %}
+            <div class="p-3">
+                <button class="btn btn-success btn-sm" type="submit"><i class="bi bi-check-lg"></i> Pagar Selecionadas</button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.getElementById('select-all').addEventListener('change', function() {
+    document.querySelectorAll('input[name="comissoes"]').forEach(cb => cb.checked = this.checked);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Solicitar Liberacao - pharmaMS{% endblock %}
+{% block page_title %}Solicitar Liberacao{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Tipo</label>
+                <select name="tipo" class="form-select" required>
+                    <option value="">Selecione...</option>
+                    {% for key, label in TIPO_CHOICES %}
+                    <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Venda (opcional)</label>
+                <select name="venda_id" class="form-select">
+                    <option value="">Nenhuma</option>
+                    {% for venda in vendas %}
+                    <option value="{{ venda.pk }}">#{{ venda.numero_venda }} - {{ venda.cliente|default:'Consumidor' }} - R$ {{ venda.total }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Motivo</label>
+                <textarea name="motivo" class="form-control" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Solicitar</button>
+            <a href="{% url 'usuarios:liberacoes' %}" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

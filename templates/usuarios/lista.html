@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Usuários - pharmaMS{% endblock %}
+{% block page_title %}Usuários{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h5>Usuários do Sistema</h5>
+        <div class="page-subtitle">Gerencie os usuários e suas permissões</div>
+    </div>
+    <a href="{% url 'usuarios:novo' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Novo Usuário
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th style="width:80px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td class="fw-medium">{{ usuario.nome_completo }}</td>
+                        <td>{{ usuario.username }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td><span class="badge badge-pharma">{{ usuario.get_perfil_display }}</span></td>
+                        <td>
+                            {% if usuario.is_active %}
+                            <span class="status-dot active"></span> Ativo
+                            {% else %}
+                            <span class="status-dot inactive"></span> Inativo
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'usuarios:editar' usuario.pk %}" class="btn btn-ghost btn-icon" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <h6>Nenhum usuário cadastrado</h6>
+                                <p>Cadastre o primeiro usuário para começar.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

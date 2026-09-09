@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nova{% endif %} Promoção - pharmaMS{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Editar{% else %}Nova{% endif %} Promoção{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-tags me-1" style="color:var(--primary);"></i>
+                <span>{% if form.instance.pk %}Editar{% else %}Nova{% endif %} Promoção</span>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome</label>
+                            <input type="text" name="{{ form.nome.name }}" class="form-control" value="{{ form.nome.value|default:'' }}" placeholder="Ex: Promoção de Natal" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo</label>
+                            <select name="{{ form.tipo.name }}" id="id_tipo" class="form-select" required>
+                                {% for val, label in form.fields.tipo.choices %}
+                                <option value="{{ val }}" {% if form.tipo.value == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Ativo</label>
+                            <div class="pt-2">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" name="{{ form.ativo.name }}" class="form-check-input" id="id_ativo" {% if form.ativo.value %}checked{% endif %} style="cursor:pointer;">
+                                    <label class="form-check-label" for="id_ativo" style="font-size:.85rem;color:var(--text-secondary);">Promoção ativa</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 field-group" id="fg-produto">
+                            <label class="form-label">Produto</label>
+                            <select name="{{ form.produto.name }}" id="id_produto" class="form-select">
+                                <option value="">---</option>
+                                {% for p in form.fields.produto.queryset %}
+                                <option value="{{ p.id }}" {% if form.produto.value|stringformat:"s" == p.id|stringformat:"s" %}selected{% endif %}>{{ p.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 field-group" id="fg-classe">
+                            <label class="form-label">Classe Terapêutica</label>
+                            <select name="{{ form.classe_terapeutica.name }}" id="id_classe_terapeutica" class="form-select">
+                                <option value="">---</option>
+                                {% for c in form.fields.classe_terapeutica.queryset %}
+                                <option value="{{ c.id }}" {% if form.classe_terapeutica.value|stringformat:"s" == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 field-group" id="fg-percentual">
+                            <label class="form-label">% Desconto</label>
+                            <div class="input-group">
+                                <input type="number" name="{{ form.percentual_desconto.name }}" id="id_percentual_desconto" class="form-control" step="0.01" value="{{ form.percentual_desconto.value|default:'0' }}" min="0" max="100">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3 field-group" id="fg-preco">
+                            <label class="form-label">Preço Promocional (R$)</label>
+                            <input type="number" name="{{ form.preco_promocional.name }}" id="id_preco_promocional" class="form-control" step="0.01" value="{{ form.preco_promocional.value|default:'0' }}" min="0">
+                        </div>
+                        <div class="col-md-3 field-group" id="fg-qtd-min">
+                            <label class="form-label">Quantidade Mínima</label>
+                            <input type="number" name="{{ form.quantidade_minima.name }}" id="id_quantidade_minima" class="form-control" value="{{ form.quantidade_minima.value|default:'' }}" min="1" placeholder="Ex: 3">
+                        </div>
+                        <div class="col-md-3 field-group" id="fg-qtd-cobrar">
+                            <label class="form-label">Pagar Quantidade</label>
+                            <input type="number" name="{{ form.quantidade_cobrar.name }}" id="id_quantidade_cobrar" class="form-control" value="{{ form.quantidade_cobrar.value|default:'' }}" min="1" placeholder="Ex: 2">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Data Início</label>
+                            <input type="date" name="{{ form.data_inicio.name }}" class="form-control" value="{{ form.data_inicio.value|date:'Y-m-d'|default:'' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data Fim</label>
+                            <input type="date" name="{{ form.data_fim.name }}" class="form-control" value="{{ form.data_fim.value|date:'Y-m-d'|default:'' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Limite por Cliente</label>
+                            <input type="number" name="{{ form.limite_por_cliente.name }}" class="form-control" value="{{ form.limite_por_cliente.value|default:'0' }}" min="0" placeholder="0 = ilimitado">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Dias da Semana</label>
+                            <div class="d-flex gap-3 flex-wrap pt-1">
+                                {% for val, label in form.fields.dias_semana.choices %}
+                                <div class="form-check">
+                                    <input type="checkbox" name="{{ form.dias_semana.name }}" value="{{ val }}" class="form-check-input" id="dia_{{ val }}" {% if val in form.dias_semana.value|default:'' %}checked{% endif %}>
+                                    <label class="form-check-label" for="dia_{{ val }}" style="font-size:.85rem;">{{ label }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> Salvar</button>
+                        <a href="{% url 'vendas:promocoes' %}" class="btn btn-ghost px-3">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function toggleFields() {
+    var tipo = document.getElementById('id_tipo').value;
+    var groups = {
+        'fg-produto': ['produto'],
+        'fg-classe': ['classe'],
+        'fg-percentual': ['produto', 'classe', 'geral'],
+        'fg-preco': ['combo'],
+        'fg-qtd-min': ['quantidade'],
+        'fg-qtd-cobrar': ['quantidade'],
+    };
+    Object.keys(groups).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = groups[id].includes(tipo) ? '' : 'none';
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var el = document.getElementById('id_tipo');
+    if (el) { el.addEventListener('change', toggleFields); toggleFields(); }
+});
+</script>
+{% endblock %}

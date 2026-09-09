@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ tipo|title }} - pharmaMS{% endblock %}
+{% block page_title %}Editar Conta a {{ tipo|title }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex align-items-center gap-2">
+    <i class="bi bi-pencil" style="color:var(--primary);"></i>
+    <span>Editar Conta</span>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Descrição</label>
+          <input type="text" name="descricao" class="form-control" value="{{ conta.descricao }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Valor</label>
+          <input type="number" name="valor" class="form-control" step="0.01" value="{{ conta.valor }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Vencimento</label>
+          <input type="date" name="data_vencimento" class="form-control" value="{{ conta.data_vencimento|date:'Y-m-d' }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select">
+            <option value="pendente"{% if conta.status == 'pendente' %} selected{% endif %}>Pendente</option>
+            <option value="pago"{% if conta.status == 'pago' %} selected{% endif %}>Pago</option>
+            <option value="atrasada"{% if conta.status == 'atrasada' %} selected{% endif %}>Atrasada</option>
+            <option value="cancelada"{% if conta.status == 'cancelada' %} selected{% endif %}>Cancelada</option>
+          </select>
+        </div>
+        {% if tipo == 'pagar' %}
+        <div class="col-md-3">
+          <label class="form-label">Data Pagamento</label>
+          <input type="date" name="data_pagamento" class="form-control" value="{{ conta.data_pagamento|date:'Y-m-d'|default:'' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Valor Pago</label>
+          <input type="number" name="valor_pago" class="form-control" step="0.01" value="{{ conta.valor_pago }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Documento</label>
+          <input type="text" name="documento" class="form-control" value="{{ conta.documento }}">
+        </div>
+        {% else %}
+        <div class="col-md-3">
+          <label class="form-label">Data Recebimento</label>
+          <input type="date" name="data_recebimento" class="form-control" value="{{ conta.data_recebimento|date:'Y-m-d'|default:'' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Valor Recebido</label>
+          <input type="number" name="valor_recebido" class="form-control" step="0.01" value="{{ conta.valor_recebido }}">
+        </div>
+        {% endif %}
+        <div class="col-12">
+          <label class="form-label">Observações</label>
+          <textarea name="observacoes" class="form-control" rows="2">{{ conta.observacoes }}</textarea>
+        </div>
+      </div>
+      <hr class="my-3">
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
+        <a href="{% if tipo == 'pagar' %}{% url 'financeiro:contas_pagar' %}{% else %}{% url 'financeiro:contas_receber' %}{% endif %}" class="btn btn-ghost">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

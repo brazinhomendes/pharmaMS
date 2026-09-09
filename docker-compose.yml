@@ -1,0 +1,84 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: pharmams-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-pharmams}
+      POSTGRES_USER: ${DB_USER:-pharmams}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pharmams123}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backup.sh:/docker-entrypoint-initdb.d/backup.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pharmams}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  evolution:
+    image: evoapicloud/evolution-api:v2.3.0
+    container_name: pharmams-evolution
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_URL: http://localhost:8080
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:-pharmams-evolution-key}
+    volumes:
+      - evolution_instances:/evolution/instances
+    depends_on:
+      - db
+
+  web:
+    build: .
+    container_name: pharmams-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DEBUG: "False"
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      DB_NAME: ${DB_NAME:-pharmams}
+      DB_USER: ${DB_USER:-pharmams}
+      DB_PASSWORD: ${DB_PASSWORD:-pharmams123}
+      DB_HOST: db
+      DB_PORT: "5432"
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    volumes:
+      - ./media:/app/media
+      - ./logs:/app/logs
+      - ./backups:/backups
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             gunicorn pharmams.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120"
+
+  backup:
+    image: postgres:16-alpine
+    container_name: pharmams-backup
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:-pharmams123}
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-pharmams}
+      DB_USER: ${DB_USER:-pharmams}
+    volumes:
+      - ./backups:/backups
+    entrypoint: >
+      sh -c '
+        apk add --no-cache bash gzip &&
+        echo "0 2 * * * pg_dump -h $$DB_HOST -U $$DB_USER -d $$DB_NAME -Fc > /backups/backup_$$(date +\%Y\%m\%d_\%H\%M\%S).dump && find /backups -name "*.dump" -mtime +30 -delete" | crontab - &&
+        crond -f
+      '
+
+volumes:
+  pgdata:
+  evolution_instances:

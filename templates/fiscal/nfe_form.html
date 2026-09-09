@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Nova NF-e - pharmaMS{% endblock %}
+{% block page_title %}Nova NF-e{% endblock %}
+{% block content %}
+<div class="card-dashboard p-4">
+    <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Modelo</label>
+                <select name="modelo" class="form-select">
+                    <option value="55">NF-e</option>
+                    <option value="65">NFC-e</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Venda</label>
+                <select name="venda" class="form-select" required>
+                    <option value="">Selecione uma venda...</option>
+                    {% for venda in vendas %}
+                    <option value="{{ venda.pk }}">Venda #{{ venda.numero_venda }} - R$ {{ venda.total|floatformat:2 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Emitir NF-e</button>
+            <a href="{% url 'fiscal:nfe_lista' %}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

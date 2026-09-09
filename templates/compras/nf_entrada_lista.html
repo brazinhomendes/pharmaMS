@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}NF Entrada - pharmaMS{% endblock %}
+{% block page_title %}Notas Fiscais de Entrada{% endblock %}
+{% block content %}
+
+<div class="card-dashboard p-0">
+    <table class="table table-pharma mb-0">
+        <thead>
+            <tr>
+                <th>Nº NF</th>
+                <th>Série</th>
+                <th>Fornecedor</th>
+                <th>Emissão</th>
+                <th>Recebimento</th>
+                <th>Valor Total</th>
+                <th>CFOP</th>
+                <th>Processada</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nf in nfs %}
+            <tr>
+                <td><strong>{{ nf.numero_nf }}</strong></td>
+                <td>{{ nf.serie|default:"-" }}</td>
+                <td>{{ nf.fornecedor.nome }}</td>
+                <td>{{ nf.data_emissao|date:"d/m/Y" }}</td>
+                <td>{{ nf.data_recebimento|date:"d/m/Y" }}</td>
+                <td>R$ {{ nf.valor_total|floatformat:2 }}</td>
+                <td>{{ nf.cfop|default:"-" }}</td>
+                <td>
+                    {% if nf.processada %}
+                    <span class="badge bg-success">Sim</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Não</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" class="text-center text-muted py-4">Nenhuma NF de entrada registrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

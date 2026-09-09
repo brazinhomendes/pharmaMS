@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Venda #{{ venda.numero_venda }} - pharmaMS{% endblock %}
+{% block page_title %}Venda #{{ venda.numero_venda }}{% endblock %}
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><strong>Informações da Venda</strong></span>
+                <span class="badge {% if venda.status == 'finalizada' %}bg-success{% elif venda.status == 'cancelada' %}bg-danger{% else %}bg-warning text-dark{% endif %} fs-6">{{ venda.get_status_display }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Número:</strong> {{ venda.numero_venda }}</p>
+                        <p><strong>Data:</strong> {{ venda.data_venda|date:'d/m/Y H:i' }}</p>
+                        <p><strong>Cliente:</strong> {{ venda.cliente|default:'---' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Forma de Pagamento:</strong> {{ venda.get_forma_pagamento_display }}</p>
+                        <p><strong>Usuário:</strong> {{ venda.usuario.get_full_name|default:venda.usuario.username }}</p>
+                        {% if venda.observacoes %}
+                        <p><strong>Observações:</strong> {{ venda.observacoes }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><strong>Itens</strong></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Produto</th><th>Lote</th><th>Qtd</th><th>Preço Unit.</th><th>Subtotal</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in venda.itens.all %}
+                        <tr>
+                            <td>{{ item.produto.nome }}</td>
+                            <td>{{ item.lote|default:'---' }}</td>
+                            <td>{{ item.quantidade }}</td>
+                            <td>R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                            <td>R$ {{ item.subtotal|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                            <td>R$ {{ venda.subtotal|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Desconto:</strong></td>
+                            <td>R$ {{ venda.desconto|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                            <td><strong>R$ {{ venda.total|floatformat:2 }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><strong>Faturas</strong></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for fatura in venda.faturas.all %}
+                        <tr>
+                            <td>{{ fatura.parcela }}x</td>
+                            <td>R$ {{ fatura.valor|floatformat:2 }}</td>
+                            <td>{{ fatura.data_vencimento|date:'d/m/Y' }}</td>
+                            <td>
+                                {% if fatura.pago %}
+                                <span class="badge bg-success">Pago</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">Pendente</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted">Nenhuma fatura.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a href="{% url 'vendas:lista' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+    {% if venda.status == 'aberta' %}
+    <a href="{% url 'vendas:cancelar' venda.pk %}" class="btn btn-outline-danger" onclick="return confirm('Cancelar esta venda?')"><i class="bi bi-x-lg"></i> Cancelar Venda</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Movimentos - pharmaMS{% endblock %}
+{% block page_title %}Movimentos de Estoque{% endblock %}
+{% block content %}
+
+<div class="card-dashboard p-0">
+    <table class="table table-pharma mb-0">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Produto</th>
+                <th>Lote</th>
+                <th>Quantidade</th>
+                <th>Saldo Ant.</th>
+                <th>Saldo Post.</th>
+                <th>Documento</th>
+                <th>Data</th>
+                <th>Usuário</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mov in movimentos %}
+            <tr>
+                <td>
+                    <span class="badge bg-{% if mov.tipo == 'entrada' %}success{% elif mov.tipo == 'saida' %}danger{% elif mov.tipo == 'perda' %}warning{% elif mov.tipo == 'ajuste' %}info{% elif mov.tipo == 'devolucao' %}primary{% else %}secondary{% endif %}">
+                        {{ mov.get_tipo_display }}
+                    </span>
+                </td>
+                <td>{{ mov.produto.nome }}</td>
+                <td>{% if mov.lote %}{{ mov.lote.codigo_lote }}{% else %}-{% endif %}</td>
+                <td>{{ mov.quantidade }}</td>
+                <td>{{ mov.saldo_anterior }}</td>
+                <td>{{ mov.saldo_posterior }}</td>
+                <td>{{ mov.documento|default:"-" }}</td>
+                <td>{{ mov.criado_em|date:"d/m/Y H:i" }}</td>
+                <td>{{ mov.usuario.get_full_name|default:mov.usuario.username|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" class="text-center text-muted py-4">Nenhum movimento registrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
